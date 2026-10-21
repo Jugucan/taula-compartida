@@ -10,33 +10,73 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CartaRouteImport } from './routes/carta'
+import { Route as DadesRouteImport } from './routes/dades'
+import { Route as EnviadaRouteImport } from './routes/enviada'
+import { Route as RevisioRouteImport } from './routes/revisio'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CartaRoute = CartaRouteImport.update({
+  id: '/carta',
+  path: '/carta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DadesRoute = DadesRouteImport.update({
+  id: '/dades',
+  path: '/dades',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnviadaRoute = EnviadaRouteImport.update({
+  id: '/enviada',
+  path: '/enviada',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevisioRoute = RevisioRouteImport.update({
+  id: '/revisio',
+  path: '/revisio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/carta': typeof CartaRoute
+  '/dades': typeof DadesRoute
+  '/enviada': typeof EnviadaRoute
+  '/revisio': typeof RevisioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/carta': typeof CartaRoute
+  '/dades': typeof DadesRoute
+  '/enviada': typeof EnviadaRoute
+  '/revisio': typeof RevisioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/carta': typeof CartaRoute
+  '/dades': typeof DadesRoute
+  '/enviada': typeof EnviadaRoute
+  '/revisio': typeof RevisioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/carta' | '/dades' | '/enviada' | '/revisio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/carta' | '/dades' | '/enviada' | '/revisio'
+  id: '__root__' | '/' | '/carta' | '/dades' | '/enviada' | '/revisio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CartaRoute: typeof CartaRoute
+  DadesRoute: typeof DadesRoute
+  EnviadaRoute: typeof EnviadaRoute
+  RevisioRoute: typeof RevisioRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +88,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/carta': {
+      id: '/carta'
+      path: '/carta'
+      fullPath: '/carta'
+      preLoaderRoute: typeof CartaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dades': {
+      id: '/dades'
+      path: '/dades'
+      fullPath: '/dades'
+      preLoaderRoute: typeof DadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/enviada': {
+      id: '/enviada'
+      path: '/enviada'
+      fullPath: '/enviada'
+      preLoaderRoute: typeof EnviadaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revisio': {
+      id: '/revisio'
+      path: '/revisio'
+      fullPath: '/revisio'
+      preLoaderRoute: typeof RevisioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CartaRoute: CartaRoute,
+  DadesRoute: DadesRoute,
+  EnviadaRoute: EnviadaRoute,
+  RevisioRoute: RevisioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
