@@ -114,7 +114,7 @@ export const demoRestaurants: Restaurant[] = [
   { id: "bistrot", name: "Bistrot Gràcia", area: "Barcelona", dishes: 18, lastUsed: "Fa 1 mes" },
 ];
 
-export type ImportedDish = { id: string; name: string; price: number | null; category: string; doubt?: string };
+export type ImportedDish = { id: string; name: string; price: number | null; category: string; doubt?: string | undefined };
 
 export const demoImported: ImportedDish[] = [
   { id: "i1", name: "Esqueixada de bacallà", price: 12, category: "Entrants" },
