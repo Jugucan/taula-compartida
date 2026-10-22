@@ -14,6 +14,11 @@ import { Route as CartaRouteImport } from './routes/carta'
 import { Route as DadesRouteImport } from './routes/dades'
 import { Route as EnviadaRouteImport } from './routes/enviada'
 import { Route as RevisioRouteImport } from './routes/revisio'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminCartaRouteImport } from './routes/admin.carta'
+import { Route as AdminComandesRouteImport } from './routes/admin.comandes'
+import { Route as AdminNovaRouteImport } from './routes/admin.nova'
+import { Route as AdminResumRouteImport } from './routes/admin.resum'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +45,31 @@ const RevisioRoute = RevisioRouteImport.update({
   path: '/revisio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCartaRoute = AdminCartaRouteImport.update({
+  id: '/admin/carta',
+  path: '/admin/carta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminComandesRoute = AdminComandesRouteImport.update({
+  id: '/admin/comandes',
+  path: '/admin/comandes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminNovaRoute = AdminNovaRouteImport.update({
+  id: '/admin/nova',
+  path: '/admin/nova',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminResumRoute = AdminResumRouteImport.update({
+  id: '/admin/resum',
+  path: '/admin/resum',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +77,11 @@ export interface FileRoutesByFullPath {
   '/dades': typeof DadesRoute
   '/enviada': typeof EnviadaRoute
   '/revisio': typeof RevisioRoute
+  '/admin/carta': typeof AdminCartaRoute
+  '/admin/comandes': typeof AdminComandesRoute
+  '/admin/nova': typeof AdminNovaRoute
+  '/admin/resum': typeof AdminResumRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +89,11 @@ export interface FileRoutesByTo {
   '/dades': typeof DadesRoute
   '/enviada': typeof EnviadaRoute
   '/revisio': typeof RevisioRoute
+  '/admin/carta': typeof AdminCartaRoute
+  '/admin/comandes': typeof AdminComandesRoute
+  '/admin/nova': typeof AdminNovaRoute
+  '/admin/resum': typeof AdminResumRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +102,49 @@ export interface FileRoutesById {
   '/dades': typeof DadesRoute
   '/enviada': typeof EnviadaRoute
   '/revisio': typeof RevisioRoute
+  '/admin/carta': typeof AdminCartaRoute
+  '/admin/comandes': typeof AdminComandesRoute
+  '/admin/nova': typeof AdminNovaRoute
+  '/admin/resum': typeof AdminResumRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/carta' | '/dades' | '/enviada' | '/revisio'
+  fullPaths:
+    | '/'
+    | '/carta'
+    | '/dades'
+    | '/enviada'
+    | '/revisio'
+    | '/admin/carta'
+    | '/admin/comandes'
+    | '/admin/nova'
+    | '/admin/resum'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/carta' | '/dades' | '/enviada' | '/revisio'
-  id: '__root__' | '/' | '/carta' | '/dades' | '/enviada' | '/revisio'
+  to:
+    | '/'
+    | '/carta'
+    | '/dades'
+    | '/enviada'
+    | '/revisio'
+    | '/admin/carta'
+    | '/admin/comandes'
+    | '/admin/nova'
+    | '/admin/resum'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/carta'
+    | '/dades'
+    | '/enviada'
+    | '/revisio'
+    | '/admin/carta'
+    | '/admin/comandes'
+    | '/admin/nova'
+    | '/admin/resum'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +153,11 @@ export interface RootRouteChildren {
   DadesRoute: typeof DadesRoute
   EnviadaRoute: typeof EnviadaRoute
   RevisioRoute: typeof RevisioRoute
+  AdminCartaRoute: typeof AdminCartaRoute
+  AdminComandesRoute: typeof AdminComandesRoute
+  AdminNovaRoute: typeof AdminNovaRoute
+  AdminResumRoute: typeof AdminResumRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +197,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RevisioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/carta': {
+      id: '/admin/carta'
+      path: '/admin/carta'
+      fullPath: '/admin/carta'
+      preLoaderRoute: typeof AdminCartaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/comandes': {
+      id: '/admin/comandes'
+      path: '/admin/comandes'
+      fullPath: '/admin/comandes'
+      preLoaderRoute: typeof AdminComandesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/nova': {
+      id: '/admin/nova'
+      path: '/admin/nova'
+      fullPath: '/admin/nova'
+      preLoaderRoute: typeof AdminNovaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/resum': {
+      id: '/admin/resum'
+      path: '/admin/resum'
+      fullPath: '/admin/resum'
+      preLoaderRoute: typeof AdminResumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +241,11 @@ const rootRouteChildren: RootRouteChildren = {
   DadesRoute: DadesRoute,
   EnviadaRoute: EnviadaRoute,
   RevisioRoute: RevisioRoute,
+  AdminCartaRoute: AdminCartaRoute,
+  AdminComandesRoute: AdminComandesRoute,
+  AdminNovaRoute: AdminNovaRoute,
+  AdminResumRoute: AdminResumRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
