@@ -43,12 +43,12 @@ function Index() {
             <p className="mt-2 text-lg text-muted-foreground">Obre la carta com si haguessis rebut l'enllaç.</p>
             <span className="mt-6 inline-flex items-center gap-2 font-bold text-primary">Veure la carta <ArrowRight className="size-5 transition group-hover:translate-x-1" /></span>
           </Link>
-          <Link to="/admin" className="group rounded-3xl bg-ink p-7 text-ink-foreground shadow-soft transition hover:shadow-lift">
+          <div className="rounded-3xl bg-ink p-7 text-ink-foreground shadow-soft transition hover:shadow-lift">
             <ChefHat className="size-8" aria-hidden />
             <h2 className="mt-5 text-2xl font-semibold">Sóc l'organitzador</h2>
             <p className="mt-2 text-lg opacity-80">Crea trobades, importa cartes i consulta els resums.</p>
-            <span className="mt-6 inline-flex items-center gap-2 font-bold">Entrar <ArrowRight className="size-5 transition group-hover:translate-x-1" /></span>
-          </Link>
+            <span className="mt-6 inline-flex items-center gap-2 font-bold">Pendent de construir</span>
+          </div>
         </div>
 
         <section className="mt-12">

@@ -13,7 +13,7 @@ const estats: Estat[] = ["buida", "error", "tancada", "carregant"];
 
 export const Route = createFileRoute("/carta")({
   validateSearch: (s: Record<string, unknown>): { estat?: Estat } =>
-    estats.includes(s.estat as Estat) ? { estat: s.estat as Estat } : {},
+    estats.includes(s["estat"] as Estat) ? { estat: s["estat"] as Estat } : {},
   head: () => ({
     meta: [
       { title: `${demoMeetup.name} · Carta de ${demoMeetup.restaurant}` },
@@ -42,7 +42,7 @@ function MeetupHeader() {
 function CartaPage() {
   const { estat } = Route.useSearch();
   const { quantities, setQty, count, total } = useOrder();
-  const [active, setActive] = useState(demoMenu[0].id);
+  const [active, setActive] = useState(demoMenu[0]?.id ?? "");
 
   if (estat === "carregant") {
     return (
