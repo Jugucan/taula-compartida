@@ -6,6 +6,7 @@ export type Dish = {
   description?: string;
   price: number;
   tags?: string[];
+  options?: { label: string; values: string[] };
 };
 
 export type MenuCategory = { id: string; name: string; dishes: Dish[] };
@@ -55,6 +56,8 @@ export const demoMenu: MenuCategory[] = [
       { id: "bacalla", name: "Bacallà a la llauna", description: "Amb mongetes del ganxet", price: 19.5 },
       { id: "galta", name: "Galta de vedella al vi negre", description: "Cocció lenta, puré de patata", price: 18 },
       { id: "arros", name: "Arròs de verdures", description: "Per a una persona", price: 15, tags: ["Vegà"] },
+      { id: "pasta", name: "Pasta fresca", description: "Amb la salsa que més t'agradi", price: 14, options: { label: "Salsa", values: ["Pesto", "Bolonyesa", "Tomàquet"] } },
+      { id: "filet", name: "Filet de vedella", price: 22, options: { label: "Punt de cocció", values: ["Al punt", "Poc fet", "Ben fet"] } },
     ],
   },
   {
@@ -88,7 +91,7 @@ export const demoMeetups: Meetup[] = [
   { id: "retrobada-80", name: "Retrobada promoció del 80", restaurant: "Can Rovira", date: "Dissabte 17 d'octubre · 21:00", deadline: "12 d'octubre", status: "done", guests: 34, ordersReceived: 31 },
 ];
 
-export type GuestOrder = { id: string; guest: string; items: { dishId: string; qty: number }[]; note?: string; sentAt: string };
+export type GuestOrder = { id: string; guest: string; items: { dishId: string; qty: number; options?: string[] }[]; note?: string; sentAt: string };
 
 export const demoOrders: GuestOrder[] = [
   { id: "o1", guest: "Montse Ribas", sentAt: "fa 2 h", items: [{ dishId: "pa", qty: 1 }, { dishId: "canelons", qty: 1 }, { dishId: "crema", qty: 1 }, { dishId: "vi", qty: 2 }] },
