@@ -5,6 +5,7 @@ import { actionVariants, StateMessage } from "@/components/app/primitives";
 import { OrderLines } from "@/components/app/OrderLines";
 import { demoMeetup } from "@/data/demo";
 import { useOrder } from "@/lib/order-store";
+import { SharedEstimate } from "@/components/app/SharedEstimate";
 
 export const Route = createFileRoute("/enviada")({
   head: () => ({
@@ -13,13 +14,15 @@ export const Route = createFileRoute("/enviada")({
       { name: "description", content: "La teva comanda per al sopar de grup." },
       { property: "og:title", content: "Comanda enviada · Taula" },
       { property: "og:description", content: "La teva comanda per al sopar de grup." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: EnviadaPage,
 });
 
 function EnviadaPage() {
-  const { sent, reset } = useOrder();
+  const { sent } = useOrder();
 
   if (!sent) {
     return (
@@ -40,9 +43,10 @@ function EnviadaPage() {
           Gràcies, {sent.guestName.split(" ")[0]}. Ja està tot fet: no cal que facis res més. Ens veiem a {demoMeetup.restaurant}.
         </p>
         <p className="mt-4 rounded-full bg-warning-soft px-4 py-1.5 text-sm font-semibold text-warning">Simulació del prototip: no s'ha enviat res de veritat</p>
-        <div className="mt-8 w-full"><OrderLines lines={sent.lines} total={sent.total} /></div>
-        <p className="mt-6 text-muted-foreground">Si vols canviar alguna cosa, avisa l'organitzadora abans del {demoMeetup.deadline}.</p>
-        <Link to="/" onClick={reset} className={actionVariants({ variant: "outline", block: true, className: "mt-8" })}>Tornar a l'inici del prototip</Link>
+        <div className="mt-8 w-full"><OrderLines lines={sent.lines} /><SharedEstimate /></div>
+        <Link to="/revisio" className={actionVariants({ block: true, className: "mt-6" })}>Editar la meva comanda</Link>
+        <p className="mt-4 text-muted-foreground">Pots fer canvis abans del {demoMeetup.deadline}. En aquest navegador recordarem la teva comanda de prova.</p>
+        <Link to="/" className={actionVariants({ variant: "outline", block: true, className: "mt-8" })}>Tornar a l'inici del prototip</Link>
       </div>
     </GuestLayout>
   );
