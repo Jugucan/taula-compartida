@@ -7,6 +7,9 @@ import { demoMeetup, demoMenu } from "@/data/demo";
 import { useOrder } from "@/lib/order-store";
 import { formatEuro, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { SharedEstimate } from "@/components/app/SharedEstimate";
+import { DishOptions } from "@/components/app/DishOptions";
+import { RecoverOrder } from "@/components/app/RecoverOrder";
 
 type Estat = "buida" | "error" | "tancada" | "carregant";
 const estats: Estat[] = ["buida", "error", "tancada", "carregant"];
@@ -20,6 +23,8 @@ export const Route = createFileRoute("/carta")({
       { name: "description", content: "Tria els teus plats per al sopar de grup." },
       { property: "og:title", content: `${demoMeetup.name} · Tria el teu menú` },
       { property: "og:description", content: `Carta de ${demoMeetup.restaurant}. Tria els plats i envia la teva comanda.` },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CartaPage,
@@ -41,7 +46,7 @@ function MeetupHeader() {
 
 function CartaPage() {
   const { estat } = Route.useSearch();
-  const { quantities, setQty, count, total } = useOrder();
+  const { quantities, setQty, count } = useOrder();
   const [active, setActive] = useState(demoMenu[0]?.id ?? "");
 
   if (estat === "carregant") {
@@ -90,6 +95,8 @@ function CartaPage() {
   return (
     <GuestLayout>
       <MeetupHeader />
+      <RecoverOrder />
+      <SharedEstimate />
       <nav className="sticky top-0 z-10 -mx-5 flex gap-2 overflow-x-auto border-b bg-background/95 px-5 py-3 backdrop-blur" aria-label="Categories">
         {demoMenu.map((c) => (
           <a key={c.id} href={`#${c.id}`} onClick={() => setActive(c.id)}
@@ -119,6 +126,7 @@ function CartaPage() {
                     <div className="mt-4 flex justify-end">
                       <QuantityStepper value={q} onChange={(v) => setQty(d.id, v)} label={d.name} />
                     </div>
+                    <DishOptions dish={d} qty={q} />
                   </li>
                 );
               })}
@@ -131,7 +139,7 @@ function CartaPage() {
         <div className="mx-auto flex max-w-2xl items-center gap-4 px-5 py-3">
           <div className="flex-1">
             <p className="flex items-center gap-2 text-sm font-semibold text-muted-foreground"><ShoppingBag className="size-4" aria-hidden /> La meva comanda</p>
-            <p className="tabular text-lg font-bold" aria-live="polite">{count === 0 ? "Encara buida" : `${plural(count, "plat", "plats")} · ${formatEuro(total)}`}</p>
+            <p className="tabular text-lg font-bold" aria-live="polite">{count === 0 ? "Encara buida" : plural(count, "plat", "plats")}</p>
           </div>
           {count > 0 ? (
             <Link to="/revisio" className={actionVariants({ size: "lg" })}>Revisar</Link>

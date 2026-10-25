@@ -10,6 +10,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Prototip navegable: la carta per als convidats i la zona de l'organitzador." },
       { property: "og:title", content: "Taula · Prototip de comandes de grup" },
       { property: "og:description", content: "Comparteix la carta, recull comandes i obtén el resum per al restaurant." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,

@@ -5,6 +5,7 @@ import { AdminLayout, adminHead } from "@/components/app/AdminLayout";
 import { actionVariants } from "@/components/app/primitives";
 import { demoRestaurants } from "@/data/demo";
 import { cn } from "@/lib/utils";
+import { useOrder } from "@/lib/order-store";
 
 export const Route = createFileRoute("/admin/nova")({
   head: () => adminHead("Crear una trobada", "Prepara una nova trobada en un minut."),
@@ -24,6 +25,7 @@ function Field({ id, label, hint, children }: { id: string; label: string; hint?
 
 function NovaPage() {
   const [restaurant, setRestaurant] = useState(demoRestaurants[0]?.id ?? "");
+  const { extra, setExtra } = useOrder();
 
   return (
     <AdminLayout title="Crear una trobada" subtitle="Només cal el bàsic. Podràs canviar-ho després.">
@@ -38,6 +40,10 @@ function NovaPage() {
             </div>
             <Field id="pressupost" label="Pressupost total" hint="(opcional)">
               <div className="relative"><input id="pressupost" inputMode="decimal" className={inputCls + " pr-10"} placeholder="520" /><span className="absolute right-4 top-1/2 mt-1 -translate-y-1/2 text-lg text-muted-foreground">€</span></div>
+            </Field>
+            <Field id="nova-extra" label="Extra fix per persona (€)" hint="(opcional)">
+              <input id="nova-extra" type="number" min="0" step="0.50" value={extra} onChange={e => setExtra(Number(e.target.value))} className={inputCls} />
+              <p className="mt-2 text-sm text-muted-foreground">Per a begudes i complements; se suma a l'import compartit.</p>
             </Field>
           </section>
 

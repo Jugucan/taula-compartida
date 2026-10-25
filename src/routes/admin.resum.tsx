@@ -2,9 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Printer } from "lucide-react";
 import { AdminLayout, adminHead } from "@/components/app/AdminLayout";
 import { Action } from "@/components/app/primitives";
-import { demoMeetup, demoMenu, demoOrders } from "@/data/demo";
+import { demoMeetup, demoMenu } from "@/data/demo";
 import { formatEuro } from "@/lib/format";
-import { consolidated, ordersTotal } from "@/lib/summary";
+import { servingDishes } from "@/lib/meal-rules";
+import { useOrder } from "@/lib/order-store";
 
 export const Route = createFileRoute("/admin/resum")({
   head: () => adminHead("Pressupost i resum", "Pressupost de la trobada i resum per al restaurant."),
@@ -12,6 +13,9 @@ export const Route = createFileRoute("/admin/resum")({
 });
 
 function ResumPage() {
+  const { orders, cost, extra, setExtra } = useOrder();
+  const ordersTotal = cost.total;
+  const consolidated = servingDishes(orders);
   const budget = demoMeetup.budget ?? 0;
   const diff = budget - ordersTotal;
   const pct = Math.min(100, Math.round((ordersTotal / budget) * 100));
@@ -19,6 +23,13 @@ function ResumPage() {
   return (
     <AdminLayout title="Pressupost i resum" subtitle={demoMeetup.name}
       actions={<Action variant="ink" size="md" className="no-print" onClick={() => window.print()}><Printer className="size-5" aria-hidden /> Imprimir el resum</Action>}>
+      <section className="no-print mb-8 border-y py-6">
+        <h2 className="text-2xl font-semibold">Import compartit</h2>
+        <div className="mt-5 grid gap-6 sm:grid-cols-2">
+          <div><label htmlFor="extra" className="block text-lg font-bold">Extra fix per persona (€)</label><input id="extra" type="number" min="0" step="0.50" value={extra} onChange={e => setExtra(Number(e.target.value))} className="mt-2 min-h-14 w-full rounded-lg border-2 border-input bg-card px-4 text-lg focus:border-primary" /><p className="mt-2 text-sm text-muted-foreground">Reserva per a begudes i complements.</p></div>
+          <dl className="space-y-2"><div className="flex justify-between gap-4"><dt>Mitjana de {cost.count} comandes</dt><dd className="tabular font-bold">{formatEuro(cost.mean)}</dd></div><div className="flex justify-between gap-4"><dt>Extra per persona</dt><dd className="tabular font-bold">{formatEuro(extra)}</dd></div><div className="flex justify-between gap-4 border-t pt-3 text-xl"><dt className="font-bold">Per persona</dt><dd className="tabular font-bold text-primary" aria-live="polite">{formatEuro(cost.perPerson)}</dd></div></dl>
+        </div>
+      </section>
       {budget > 0 && (
         <section className="no-print rounded-3xl border bg-card p-6">
           <h2 className="text-xl font-semibold">Pressupost</h2>
@@ -35,7 +46,7 @@ function ResumPage() {
         <header className="border-b-2 border-foreground/80 pb-4">
           <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Comanda per a {demoMeetup.restaurant}</p>
           <h2 className="mt-1 text-2xl font-semibold">{demoMeetup.name}</h2>
-          <p className="text-lg text-muted-foreground">{demoMeetup.date} · {demoOrders.length} persones</p>
+          <p className="text-lg text-muted-foreground">{demoMeetup.date} · {orders.length} persones</p>
         </header>
         {demoMenu.map((cat) => {
           const lines = consolidated.filter((l) => cat.dishes.some((d) => d.id === l.dish.id));
@@ -46,7 +57,7 @@ function ResumPage() {
               <ul className="mt-2 divide-y">
                 {lines.map((l) => (
                   <li key={l.dish.id} className="flex justify-between gap-4 py-2.5 text-lg">
-                    <span><span className="tabular inline-block w-10 font-bold">{l.qty}×</span>{l.dish.name}</span>
+                    <span><span className="tabular inline-block w-10 font-bold">{l.qty}×</span>{l.dish.name}{l.guests.some(g => g.options.length > 0) && <span className="block text-base text-muted-foreground">{l.guests.filter(g => g.options.length > 0).map(g => `${g.guest}: ${g.options.join(", ")}`).join(" · ")}</span>}</span>
                     <span className="tabular text-muted-foreground">{formatEuro(l.qty * l.dish.price)}</span>
                   </li>
                 ))}
@@ -55,7 +66,8 @@ function ResumPage() {
           );
         })}
         <div className="mt-6 flex justify-between border-t-2 border-foreground/80 pt-4 text-xl font-bold"><span>Total</span><span className="tabular">{formatEuro(ordersTotal)}</span></div>
-        <p className="mt-6 rounded-xl bg-warning-soft p-3 font-semibold text-warning">Notes: Pilar Soler — sense gluten.</p>
+        <p className="mt-3 text-lg">Import compartit: <span className="tabular font-bold">{formatEuro(cost.perPerson)}</span> per persona (inclou {formatEuro(extra)} d'extres).</p>
+        {orders.filter(o => o.note).map(o => <p key={o.id} className="mt-3 rounded-lg bg-warning-soft p-3 font-semibold text-warning">{o.guest} — {o.note}</p>)}
       </article>
     </AdminLayout>
   );
