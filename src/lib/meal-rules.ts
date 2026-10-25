@@ -22,12 +22,15 @@ export function similarNames(name: string, orders: GuestOrder[], excludeId?: str
     if (existing === input || (first === given && (input === given || existing === first))) return true;
     if (input === given && (first.startsWith(input) || input.startsWith(first))) return true;
     if (given.length < 4 || first.length < 4) return false;
-    const distance = Array.from({ length: given.length + 1 }, (_, i) => [i]);
-    for (let j = 0; j <= first.length; j++) distance[0][j] = j;
-    for (let i = 1; i <= given.length; i++) for (let j = 1; j <= first.length; j++) {
-      distance[i][j] = Math.min(distance[i - 1][j] + 1, distance[i][j - 1] + 1, distance[i - 1][j - 1] + (given[i - 1] === first[j - 1] ? 0 : 1));
+    let previous = Array.from({ length: first.length + 1 }, (_, j) => j);
+    for (let i = 1; i <= given.length; i++) {
+      const current = [i];
+      for (let j = 1; j <= first.length; j++) {
+        current[j] = Math.min((previous[j] ?? 0) + 1, (current[j - 1] ?? 0) + 1, (previous[j - 1] ?? 0) + (given[i - 1] === first[j - 1] ? 0 : 1));
+      }
+      previous = current;
     }
-    return distance[given.length][first.length] <= 1;
+    return (previous[first.length] ?? Infinity) <= 1;
   });
 }
 

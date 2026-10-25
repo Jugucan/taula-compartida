@@ -18,7 +18,7 @@ describe("Shared meal rules", () => {
   });
   it("offers Susanna when Su returns without silently changing an order", () => {
     expect(similarNames("Su", orders).map(o => o.id)).toEqual(["susanna"]);
-    expect(orders[0].guest).toBe("Susanna");
+    expect(orders[0]?.guest).toBe("Susanna");
   });
   it("excludes the current order from duplicate-name suggestions", () => {
     expect(similarNames("Susanna", orders, "susanna")).toEqual([]);
@@ -27,13 +27,13 @@ describe("Shared meal rules", () => {
     expect(similarNames("Maria", orders)).toEqual([]);
   });
   it("updates a recovered order without adding another diner", () => {
-    const updated = upsertOrder(orders, { ...orders[0], items: [{ dishId: "pasta", qty: 1, options: ["Tomàquet"] }] });
+    const updated = upsertOrder(orders, { id: "susanna", guest: "Susanna", sentAt: "ara", items: [{ dishId: "pasta", qty: 1, options: ["Tomàquet"] }] });
     expect(updated).toHaveLength(2);
     expect(sharedCost(updated).perPerson).toBe(18);
   });
   it("preserves each serving's sauce and meat doneness with the diner's name", () => {
     const dishes = servingDishes(orders);
     expect(dishes.find(l => l.dish.id === "pasta")?.guests).toEqual([{ guest: "Susanna", qty: 2, options: ["Pesto", "Bolonyesa"], note: undefined }]);
-    expect(dishes.find(l => l.dish.id === "filet")?.guests[0].options).toEqual(["Poc fet"]);
+    expect(dishes.find(l => l.dish.id === "filet")?.guests[0]?.options).toEqual(["Poc fet"]);
   });
 });
