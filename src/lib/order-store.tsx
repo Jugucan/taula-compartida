@@ -13,7 +13,7 @@ type OrderState = {
   simulateSend: () => Promise<void>; recover: (id: string) => void; reset: () => void;
 };
 const OrderContext = createContext<OrderState | null>(null);
-const storageKey = "taula-shared-meal-prototype-v1";
+const storageKey = "taula-shared-meal-prototype-v2";
 
 export function OrderProvider({ children }: { children: ReactNode }) {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -53,7 +53,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       cost: sharedCost(orders, extra), editingId, remembered: orders.find(o => o.id === rememberedId),
       setQty: (id, qty) => setQuantities(q => ({ ...q, [id]: Math.max(0, Math.min(20, qty)) })),
       setOption: (id, index, option) => setSelections(s => { const values = [...(s[id] ?? [])]; values[index] = option; return { ...s, [id]: values }; }),
-      setGuestName, setNote, setExtra: v => setExtraState(Number.isFinite(v) ? Math.max(0, Math.round(v * 100) / 100) : 0),
+      setGuestName, setNote, setExtra: v => setExtraState(Number.isFinite(v) ? Math.max(0, Math.round(v * 100)) : 0),
       simulateSend: async () => {
         await new Promise(r => setTimeout(r, 500));
         const id = editingId ?? crypto.randomUUID();
