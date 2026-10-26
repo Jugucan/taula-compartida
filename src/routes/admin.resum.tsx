@@ -26,7 +26,7 @@ function ResumPage() {
       <section className="no-print mb-8 border-y py-6">
         <h2 className="text-2xl font-semibold">Import compartit</h2>
         <div className="mt-5 grid gap-6 sm:grid-cols-2">
-          <div><label htmlFor="extra" className="block text-lg font-bold">Extra fix per persona (€)</label><input id="extra" type="number" min="0" step="0.50" value={extra} onChange={e => setExtra(Number(e.target.value))} className="mt-2 min-h-14 w-full rounded-lg border-2 border-input bg-card px-4 text-lg focus:border-primary" /><p className="mt-2 text-sm text-muted-foreground">Reserva per a begudes i complements.</p></div>
+          <div><label htmlFor="extra" className="block text-lg font-bold">Extra fix per persona (€)</label><input id="extra" type="number" min="0" step="0.50" value={extra / 100} onChange={e => setExtra(Number(e.target.value))} className="mt-2 min-h-14 w-full rounded-lg border-2 border-input bg-card px-4 text-lg focus:border-primary" /><p className="mt-2 text-sm text-muted-foreground">Reserva per a begudes i complements.</p></div>
           <dl className="space-y-2"><div className="flex justify-between gap-4"><dt>Mitjana de {cost.count} comandes</dt><dd className="tabular font-bold">{formatEuro(cost.mean)}</dd></div><div className="flex justify-between gap-4"><dt>Extra per persona</dt><dd className="tabular font-bold">{formatEuro(extra)}</dd></div><div className="flex justify-between gap-4 border-t pt-3 text-xl"><dt className="font-bold">Per persona</dt><dd className="tabular font-bold text-primary" aria-live="polite">{formatEuro(cost.perPerson)}</dd></div></dl>
         </div>
       </section>
