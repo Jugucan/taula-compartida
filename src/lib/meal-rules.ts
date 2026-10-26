@@ -7,7 +7,7 @@ export function orderTotal(items: GuestOrder["items"]) {
 export function sharedCost(orders: GuestOrder[], extra = 0) {
   const total = orders.reduce((sum, order) => sum + orderTotal(order.items), 0);
   const count = orders.length;
-  return { total, count, mean: count ? total / count : 0, perPerson: count ? total / count + extra : 0 };
+    return { total, count, mean: count ? Math.round(total / count) : 0, perPerson: count ? Math.round(total / count) + extra : 0 };
 }
 
 const normalize = (name: string) => name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9 ]/g, "").trim().replace(/\s+/g, " ");
