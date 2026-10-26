@@ -8,13 +8,13 @@ const orders: GuestOrder[] = [
 ];
 describe("Shared meal rules", () => {
   it("divides submitted totals by submitted guests, not expected attendees", () => {
-    expect(sharedCost(orders).perPerson).toBe((28 + 22) / 2);
+    expect(sharedCost(orders).perPerson).toBe(2500);
   });
   it("adds the fixed extra to each person's mean", () => {
-    expect(sharedCost(orders, 5).perPerson).toBe(30);
+    expect(sharedCost(orders, 500).perPerson).toBe(3000);
   });
   it("handles no submitted orders without division by zero", () => {
-    expect(sharedCost([], 5)).toEqual({ total: 0, count: 0, mean: 0, perPerson: 0 });
+    expect(sharedCost([], 500)).toEqual({ total: 0, count: 0, mean: 0, perPerson: 0 });
   });
   it("offers Susanna when Su returns without silently changing an order", () => {
     expect(similarNames("Su", orders).map(o => o.id)).toEqual(["susanna"]);
@@ -29,7 +29,7 @@ describe("Shared meal rules", () => {
   it("updates a recovered order without adding another diner", () => {
     const updated = upsertOrder(orders, { id: "susanna", guest: "Susanna", sentAt: "ara", items: [{ dishId: "pasta", qty: 1, options: ["Tomàquet"] }] });
     expect(updated).toHaveLength(2);
-    expect(sharedCost(updated).perPerson).toBe(18);
+    expect(sharedCost(updated).perPerson).toBe(1800);
   });
   it("preserves each serving's sauce and meat doneness with the diner's name", () => {
     const dishes = servingDishes(orders);
