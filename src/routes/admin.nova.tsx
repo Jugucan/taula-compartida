@@ -42,7 +42,7 @@ function NovaPage() {
               <div className="relative"><input id="pressupost" inputMode="decimal" className={inputCls + " pr-10"} placeholder="520" /><span className="absolute right-4 top-1/2 mt-1 -translate-y-1/2 text-lg text-muted-foreground">€</span></div>
             </Field>
             <Field id="nova-extra" label="Extra fix per persona (€)" hint="(opcional)">
-              <input id="nova-extra" type="number" min="0" step="0.50" value={extra} onChange={e => setExtra(Number(e.target.value))} className={inputCls} />
+              <input id="nova-extra" type="number" min="0" step="0.50" value={extra / 100} onChange={e => setExtra(Number(e.target.value))} className={inputCls} />
               <p className="mt-2 text-sm text-muted-foreground">Per a begudes i complements; se suma a l'import compartit.</p>
             </Field>
           </section>
