@@ -34,10 +34,10 @@ export const demoMeetup: Meetup = {
   status: "open",
   guests: 16,
   ordersReceived: 11,
-  budget: 520,
+  budget: 52000,
 };
 
-export const demoMenu: MenuCategory[] = [
+const demoMenuEuros: MenuCategory[] = [
   {
     id: "entrants",
     name: "Entrants",
@@ -81,6 +81,11 @@ export const demoMenu: MenuCategory[] = [
   },
 ];
 
+   // Els preus de dalt estan en euros per comoditat; aquí es converteixen a cèntims enters.
+   export const demoMenu: MenuCategory[] = demoMenuEuros.map((c) => ({
+     ...c,
+     dishes: c.dishes.map((d) => ({ ...d, price: Math.round(d.price * 100) })),
+   }));
 export const allDishes = demoMenu.flatMap((c) => c.dishes);
 export const findDish = (id: string) => allDishes.find((d) => d.id === id);
 
