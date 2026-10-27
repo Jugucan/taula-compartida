@@ -19,7 +19,6 @@ import { Route as AdminCartaRouteImport } from './routes/admin.carta'
 import { Route as AdminComandesRouteImport } from './routes/admin.comandes'
 import { Route as AdminNovaRouteImport } from './routes/admin.nova'
 import { Route as AdminResumRouteImport } from './routes/admin.resum'
-import { Route as ApiSalutRouteImport } from './routes/api.salut'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,11 +70,6 @@ const AdminResumRoute = AdminResumRouteImport.update({
   path: '/admin/resum',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSalutRoute = ApiSalutRouteImport.update({
-  id: '/api/salut',
-  path: '/api/salut',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,7 +81,6 @@ export interface FileRoutesByFullPath {
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
-  '/api/salut': typeof ApiSalutRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -100,7 +93,6 @@ export interface FileRoutesByTo {
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
-  '/api/salut': typeof ApiSalutRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -114,7 +106,6 @@ export interface FileRoutesById {
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
-  '/api/salut': typeof ApiSalutRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -129,7 +120,6 @@ export interface FileRouteTypes {
     | '/admin/comandes'
     | '/admin/nova'
     | '/admin/resum'
-    | '/api/salut'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -142,7 +132,6 @@ export interface FileRouteTypes {
     | '/admin/comandes'
     | '/admin/nova'
     | '/admin/resum'
-    | '/api/salut'
     | '/admin'
   id:
     | '__root__'
@@ -155,7 +144,6 @@ export interface FileRouteTypes {
     | '/admin/comandes'
     | '/admin/nova'
     | '/admin/resum'
-    | '/api/salut'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -169,7 +157,6 @@ export interface RootRouteChildren {
   AdminComandesRoute: typeof AdminComandesRoute
   AdminNovaRoute: typeof AdminNovaRoute
   AdminResumRoute: typeof AdminResumRoute
-  ApiSalutRoute: typeof ApiSalutRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -245,13 +232,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminResumRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/salut': {
-      id: '/api/salut'
-      path: '/api/salut'
-      fullPath: '/api/salut'
-      preLoaderRoute: typeof ApiSalutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -265,7 +245,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminComandesRoute: AdminComandesRoute,
   AdminNovaRoute: AdminNovaRoute,
   AdminResumRoute: AdminResumRoute,
-  ApiSalutRoute: ApiSalutRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport

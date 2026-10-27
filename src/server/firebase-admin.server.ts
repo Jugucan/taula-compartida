@@ -7,10 +7,10 @@ function getAdminApp(): App {
   const existing = getApps()[0];
   if (existing) return existing;
 
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const projectId = process.env["FIREBASE_PROJECT_ID"];
+  const clientEmail = process.env["FIREBASE_CLIENT_EMAIL"];
   // Netlify pot desar els salts de línia de la clau com a "\n" literals: els restaurem.
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const privateKey = process.env["FIREBASE_PRIVATE_KEY"]?.replace(/\\n/g, "\n");
 
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error("Falten variables d'entorn de Firebase al servidor.");
