@@ -1,6 +1,6 @@
 // Porta d'entrada de la zona d'organitzadora: només es veu el contingut si s'ha iniciat sessió.
 // Els convidats no passen mai per aquí.
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import {
   browserSessionPersistence,
   onAuthStateChanged,
@@ -14,6 +14,10 @@ import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { getClientAuth, getClientDb } from "@/lib/firebase-client";
 import { authErrorMessage } from "@/lib/auth-errors";
 import { Action, Logo } from "./primitives";
+
+// Identificador de l'organitzadora; el fan servir les pantalles de dins de la zona protegida.
+const AdminUidContext = createContext<string>("");
+export const useAdminUid = () => useContext(AdminUidContext);
 
 const fieldClass = "min-h-14 w-full rounded-2xl border-2 border-input bg-card px-4 text-lg outline-none focus:border-primary";
 
@@ -142,7 +146,7 @@ export function AdminGate({ children }: { children: ReactNode }) {
         <span className="truncate">Sessió iniciada: {user.email}</span>
         <button onClick={() => signOut(getClientAuth())} className="shrink-0 font-semibold underline">Tanca la sessió</button>
       </div>
-      {children}
+      <AdminUidContext.Provider value={user.uid}>{children}</AdminUidContext.Provider>
     </>
   );
 }

@@ -3,7 +3,8 @@ import { Check, Plus, Store } from "lucide-react";
 import { useState } from "react";
 import { AdminLayout, adminHead } from "@/components/app/AdminLayout";
 import { actionVariants } from "@/components/app/primitives";
-import { demoRestaurants } from "@/data/demo";
+import { useAdminUid } from "@/components/app/AdminGate";
+import { useRestaurants } from "@/lib/use-restaurants";
 import { cn } from "@/lib/utils";
 import { useOrder } from "@/lib/order-store";
 
@@ -24,11 +25,22 @@ function Field({ id, label, hint, children }: { id: string; label: string; hint?
 }
 
 function NovaPage() {
-  const [restaurant, setRestaurant] = useState(demoRestaurants[0]?.id ?? "");
+  return (
+    <AdminLayout title="Crear una trobada" subtitle="Només cal el bàsic. Podràs canviar-ho després.">
+      <NovaForm />
+    </AdminLayout>
+  );
+}
+
+function NovaForm() {
+  const uid = useAdminUid();
+  const { data: restaurants, isLoading, isError } = useRestaurants(uid);
+  const [chosen, setChosen] = useState("");
+  const restaurant = chosen || restaurants?.[0]?.id || "";
   const { extra, setExtra } = useOrder();
 
   return (
-    <AdminLayout title="Crear una trobada" subtitle="Només cal el bàsic. Podràs canviar-ho després.">
+    <>
       <form className="grid gap-8 lg:grid-cols-[1fr_22rem]" onSubmit={(e) => e.preventDefault()}>
         <div className="space-y-8">
           <section className="space-y-5 rounded-3xl border bg-card p-6">
@@ -50,11 +62,14 @@ function NovaPage() {
           <section className="rounded-3xl border bg-card p-6">
             <h2 className="text-xl font-semibold">2. El restaurant</h2>
             <div className="mt-4 grid gap-3" role="radiogroup" aria-label="Restaurant">
-              {demoRestaurants.map((r) => (
-                <button type="button" role="radio" aria-checked={restaurant === r.id} key={r.id} onClick={() => setRestaurant(r.id)}
+              {isLoading && <p className="text-lg text-muted-foreground">Carregant els teus restaurants…</p>}
+              {isError && <p role="alert" className="rounded-2xl bg-destructive-soft p-4 text-destructive">No s'han pogut carregar els restaurants. Torna-ho a provar d'aquí una estona.</p>}
+              {restaurants?.length === 0 && <p className="text-lg text-muted-foreground">Encara no tens cap restaurant. Afegeix-ne un per començar.</p>}
+              {(restaurants ?? []).map((r) => (
+                <button type="button" role="radio" aria-checked={restaurant === r.id} key={r.id} onClick={() => setChosen(r.id)}
                   className={cn("flex items-center gap-4 rounded-2xl border-2 p-4 text-left transition", restaurant === r.id ? "border-primary bg-primary-soft" : "border-border hover:border-input")}>
                   <Store className="size-6 shrink-0 text-muted-foreground" aria-hidden />
-                  <span className="flex-1"><span className="block font-bold">{r.name}</span><span className="text-muted-foreground">{r.area} · {r.dishes} plats a la carta</span></span>
+                  <span className="flex-1"><span className="block font-bold">{r.name}</span><span className="text-muted-foreground">{r.dishCount} plats a la carta</span></span>
                   {restaurant === r.id && <span className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground"><Check className="size-5" aria-hidden /></span>}
                 </button>
               ))}
@@ -76,6 +91,6 @@ function NovaPage() {
           </div>
         </aside>
       </form>
-    </AdminLayout>
+    </>
   );
 }
