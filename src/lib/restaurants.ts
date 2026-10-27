@@ -1,15 +1,15 @@
 // Restaurants i cartes de l'organitzadora (Firestore, des del navegador).
 // Model: workspaces/{uid}/restaurants/{id} amb la carta dins del mateix document
 // (una sola lectura per restaurant). Preus en cèntims enters.
-import { collection, doc, getDocs, limit, orderBy, query, serverTimestamp, setDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, increment, limit, orderBy, query, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import type { Dish, MenuCategory } from "@/data/demo";
-import { parseEuroToCents } from "@/lib/money";
+import { centsToInput, parseEuroToCents } from "@/lib/money";
 import { getClientDb } from "@/lib/firebase-client";
 
 export const CATEGORIES = ["Entrants", "Primers", "Segons", "Postres", "Begudes", "Altres"] as const;
 export const MAX_DISHES = 200;
 
-export type DishDraft = { key: string; category: string; name: string; price: string };
+export type DishDraft = { key: string; category: string; name: string; price: string; id?: string };
 export type StoredRestaurant = { id: string; name: string; url: string; categories: MenuCategory[]; dishCount: number };
 
 type BuildResult = { ok: true; categories: MenuCategory[]; dishCount: number } | { ok: false; error: string };
@@ -31,7 +31,7 @@ export function buildMenu(drafts: DishDraft[], makeId: () => string = () => cryp
     if (price === null || price <= 0) return { ok: false, error: `Revisa el preu de «${name}». Escriu-lo així: 12,50` };
     const category = (CATEGORIES as readonly string[]).includes(draft.category) ? draft.category : "Altres";
     const list = byCategory.get(category) ?? [];
-    list.push({ id: makeId(), name, price });
+    list.push({ id: draft.id ?? makeId(), name, price });
     byCategory.set(category, list);
   }
 
@@ -66,4 +66,28 @@ export async function listRestaurants(uid: string): Promise<StoredRestaurant[]> 
 /** Desa un restaurant amb un identificador fix: reintentar no el duplica. */
 export async function saveRestaurant(uid: string, id: string, data: { name: string; url: string; categories: MenuCategory[]; dishCount: number }) {
   await setDoc(doc(restaurantsPath(uid), id), { ...data, version: 1, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+}
+
+/** Converteix un restaurant desat en files editables (conservant l'identificador de cada plat). */
+export function draftsFromRestaurant(r: StoredRestaurant): DishDraft[] {
+  return r.categories.flatMap((c) => c.dishes.map((d) => ({ key: d.id, id: d.id, category: c.name, name: d.name, price: centsToInput(d.price) })));
+}
+
+function toStored(id: string, data: Record<string, unknown>): StoredRestaurant {
+  return { id, name: String(data["name"] ?? ""), url: String(data["url"] ?? ""), categories: (data["categories"] ?? []) as MenuCategory[], dishCount: Number(data["dishCount"] ?? 0) };
+}
+
+/** Una sola lectura. Retorna null si no existeix. */
+export async function getRestaurant(uid: string, id: string): Promise<StoredRestaurant | null> {
+  const snap = await getDoc(doc(restaurantsPath(uid), id));
+  return snap.exists() ? toStored(snap.id, snap.data()) : null;
+}
+
+/** Actualitza només els camps que canvien. */
+export async function updateRestaurant(uid: string, id: string, data: { name: string; url: string; categories: MenuCategory[]; dishCount: number }) {
+  await updateDoc(doc(restaurantsPath(uid), id), { ...data, version: increment(1), updatedAt: serverTimestamp() });
+}
+
+export async function deleteRestaurant(uid: string, id: string) {
+  await deleteDoc(doc(restaurantsPath(uid), id));
 }

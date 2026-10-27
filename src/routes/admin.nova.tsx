@@ -66,12 +66,15 @@ function NovaForm() {
               {isError && <p role="alert" className="rounded-2xl bg-destructive-soft p-4 text-destructive">No s'han pogut carregar els restaurants. Torna-ho a provar d'aquí una estona.</p>}
               {restaurants?.length === 0 && <p className="text-lg text-muted-foreground">Encara no tens cap restaurant. Afegeix-ne un per començar.</p>}
               {(restaurants ?? []).map((r) => (
-                <button type="button" role="radio" aria-checked={restaurant === r.id} key={r.id} onClick={() => setChosen(r.id)}
-                  className={cn("flex items-center gap-4 rounded-2xl border-2 p-4 text-left transition", restaurant === r.id ? "border-primary bg-primary-soft" : "border-border hover:border-input")}>
+                <div key={r.id} className="flex items-stretch gap-2">
+                <button type="button" role="radio" aria-checked={restaurant === r.id} onClick={() => setChosen(r.id)}
+                  className={cn("flex flex-1 items-center gap-4 rounded-2xl border-2 p-4 text-left transition", restaurant === r.id ? "border-primary bg-primary-soft" : "border-border hover:border-input")}>
                   <Store className="size-6 shrink-0 text-muted-foreground" aria-hidden />
                   <span className="flex-1"><span className="block font-bold">{r.name}</span><span className="text-muted-foreground">{r.dishCount} plats a la carta</span></span>
                   {restaurant === r.id && <span className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground"><Check className="size-5" aria-hidden /></span>}
                 </button>
+                <Link to="/admin/restaurant/$id" params={{ id: r.id }} className={actionVariants({ variant: "outline", size: "md", className: "h-auto" })}>Editar</Link>
+                </div>
               ))}
               <Link to="/admin/carta" className={actionVariants({ variant: "outline", size: "md" })}><Plus className="size-5" aria-hidden /> Afegir un restaurant nou</Link>
             </div>

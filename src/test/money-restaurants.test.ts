@@ -53,3 +53,24 @@ describe("cleanUrl", () => {
     expect(cleanUrl("no és un enllaç").ok).toBe(false);
   });
 });
+
+import { draftsFromRestaurant, type StoredRestaurant } from "@/lib/restaurants";
+
+describe("modificar un restaurant", () => {
+  const stored: StoredRestaurant = {
+    id: "r1", name: "Prova", url: "", dishCount: 2,
+    categories: [{ id: "primers", name: "Primers", dishes: [{ id: "abc", name: "Canelons", price: 980 }] }, { id: "postres", name: "Postres", dishes: [{ id: "def", name: "Flam", price: 400 }] }],
+  };
+  it("converteix la carta desada en files editables", () => {
+    const drafts = draftsFromRestaurant(stored);
+    expect(drafts.map((d) => [d.id, d.category, d.name, d.price])).toEqual([["abc", "Primers", "Canelons", "9,80"], ["def", "Postres", "Flam", "4,00"]]);
+  });
+  it("conserva l'identificador dels plats en desar els canvis i crea'n de nous només per als plats afegits", () => {
+    const drafts = draftsFromRestaurant(stored);
+    drafts[0]!.price = "10,00";
+    drafts.push({ key: "nou", category: "Begudes", name: "Aigua", price: "2" });
+    const r = buildMenu(drafts, () => "nou-id");
+    const dishes = r.ok ? r.categories.flatMap((c) => c.dishes) : [];
+    expect(dishes.map((d) => [d.id, d.price])).toEqual([["abc", 1000], ["def", 400], ["nou-id", 200]]);
+  });
+});
