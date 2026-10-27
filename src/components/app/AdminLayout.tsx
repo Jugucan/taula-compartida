@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Home, ListChecks, PlusCircle, Receipt } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
+import { AdminGate } from "./AdminGate";
 import { DemoRibbon, Logo } from "./primitives";
 
 const nav = [
@@ -10,7 +11,7 @@ const nav = [
   { to: "/admin/resum", label: "Resum", icon: Receipt },
 ] as const;
 
-export function AdminLayout({ children, title, subtitle, actions }: { children: ReactNode; title: string; subtitle?: string; actions?: ReactNode }) {
+function AdminLayoutInner({ children, title, subtitle, actions }: { children: ReactNode; title: string; subtitle?: string; actions?: ReactNode }) {
   return (
     <div className="min-h-screen pb-24 md:pb-0">
       <DemoRibbon />
@@ -47,6 +48,15 @@ export function AdminLayout({ children, title, subtitle, actions }: { children: 
     </div>
   );
 }
+
+   // Tota la zona d'organitzadora passa per la porta d'entrada (AdminGate).
+   export function AdminLayout(props: ComponentProps<typeof AdminLayoutInner>) {
+     return (
+       <AdminGate>
+         <AdminLayoutInner {...props} />
+       </AdminGate>
+     );
+   }
 
 export function adminHead(title: string, description: string) {
   return {
