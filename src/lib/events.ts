@@ -76,7 +76,7 @@ export function validateNewDeadline(newDeadline: string, eventDateTime: string, 
   return { ok: true };
 }
 
-const NEXT: Record<EventStatus, EventStatus[]> = { draft: ["open"], open: ["closed", "done"], closed: ["open", "done"], done: [] };
+const NEXT: Record<EventStatus, EventStatus[]> = { draft: ["open"], open: ["closed", "done"], closed: ["open", "done"], done: ["open"] };
 export const canTransition = (from: EventStatus, to: EventStatus) => NEXT[from].includes(to);
 
 /** Codi aleatori de 16 caràcters (80 bits) per a l'enllaç dels convidats. Impossible d'endevinar. */
