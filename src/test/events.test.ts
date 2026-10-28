@@ -36,7 +36,8 @@ describe("estats", () => {
     expect(canTransition("draft", "done")).toBe(false);
     expect(canTransition("open", "closed")).toBe(true);
     expect(canTransition("closed", "open")).toBe(true);
-    expect(canTransition("done", "open")).toBe(false);
+    expect(canTransition("done", "open")).toBe(true);
+    expect(canTransition("done", "closed")).toBe(false);
   });
 });
 
