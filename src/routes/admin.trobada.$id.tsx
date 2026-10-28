@@ -27,7 +27,7 @@ const helper: Record<EventStatus, string> = {
   draft: "Ara mateix és un esborrany: els convidats encara no hi poden entrar. Quan estigui tot a punt, obre les comandes.",
   open: "Les comandes estan obertes: els convidats poden triar els plats amb l'enllaç.",
   closed: "Les comandes estan tancades: els convidats ja no poden fer canvis. Pots tornar-les a obrir.",
-  done: "La trobada ha acabat. Es conserva a l'historial.",
+  done: "La trobada està finalitzada i es conserva a l'historial. Si cal, la pots tornar a obrir.",
 };
 
 function TrobadaLoader({ id }: { id: string }) {
@@ -141,7 +141,7 @@ function TrobadaView({ event, uid }: { event: StoredEvent; uid: string }) {
           </div>
         )}
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          {(shown === "draft" || shown === "closed") && !askDate && <Action onClick={startOpen} disabled={saving}>{shown === "draft" ? "Obrir les comandes" : "Tornar a obrir les comandes"}</Action>}
+          {(shown === "draft" || shown === "closed" || shown === "done") && !askDate && <Action onClick={startOpen} disabled={saving}>{shown === "draft" ? "Obrir les comandes" : "Tornar a obrir les comandes"}</Action>}
           {shown === "open" && <Action onClick={() => change("closed")} disabled={saving}>Tancar les comandes</Action>}
           {canTransition(event.status, "done") && !confirmDone && <Action variant="outline" onClick={() => setConfirmDone(true)} disabled={saving}>Finalitzar la trobada</Action>}
         </div>
@@ -158,7 +158,7 @@ function TrobadaView({ event, uid }: { event: StoredEvent; uid: string }) {
         )}
         {confirmDone && (
           <div role="alertdialog" aria-label="Confirma que vols finalitzar la trobada" className="mt-4 rounded-2xl bg-secondary p-4">
-            <p className="font-semibold">Segur que vols finalitzar la trobada? Després ja no es pot tornar a obrir.</p>
+            <p className="font-semibold">Segur que vols finalitzar la trobada? Si cal, la podràs tornar a obrir.</p>
             <div className="mt-3 flex flex-col gap-3 sm:flex-row">
               <Action variant="outline" onClick={() => setConfirmDone(false)} disabled={saving}>No, encara no</Action>
               <Action variant="ink" onClick={() => change("done")} disabled={saving}>{saving ? "Desant…" : "Sí, finalitzar"}</Action>
