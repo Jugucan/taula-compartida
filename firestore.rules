@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Només l'administradora propietària de l'espai hi té accés.
+    function isOwner(wsId) {
+      return request.auth != null && request.auth.uid == wsId;
+    }
+
+    match /workspaces/{wsId} {
+      allow read, write: if isOwner(wsId);
+
+      match /restaurants/{restaurantId} {
+        allow read, write: if isOwner(wsId);
+
+        match /menus/{menuId} {
+          allow read, write: if isOwner(wsId);
+        }
+      }
+
+      match /events/{eventId} {
+        allow read, write: if isOwner(wsId);
+
+        // Les comandes només es poden llegir; les escriu el servidor.
+        match /orders/{orderId} {
+          allow read: if isOwner(wsId);
+        }
+      }
+    }
+
+    // Enllaços públics: l'organitzadora només pot crear/esborrar enllaços cap al SEU espai.
+    // Ningú pot llegir-los des del navegador; només els llegeix el servidor.
+    match /links/{code} {
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['wsId', 'eventId'])
+        && request.resource.data.wsId == request.auth.uid
+        && request.resource.data.eventId is string;
+      allow delete: if request.auth != null && resource.data.wsId == request.auth.uid;
+      allow read, update: if false;
+    }
+
+    // Qualsevol altra cosa: prohibida.
+  }
+}

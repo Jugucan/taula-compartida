@@ -20,6 +20,7 @@ import { Route as AdminComandesRouteImport } from './routes/admin.comandes'
 import { Route as AdminNovaRouteImport } from './routes/admin.nova'
 import { Route as AdminResumRouteImport } from './routes/admin.resum'
 import { Route as AdminRestaurantIdRouteImport } from './routes/admin.restaurant.$id'
+import { Route as AdminTrobadaIdRouteImport } from './routes/admin.trobada.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +77,11 @@ const AdminRestaurantIdRoute = AdminRestaurantIdRouteImport.update({
   path: '/admin/restaurant/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTrobadaIdRoute = AdminTrobadaIdRouteImport.update({
+  id: '/admin/trobada/$id',
+  path: '/admin/trobada/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/admin/resum': typeof AdminResumRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/restaurant/$id': typeof AdminRestaurantIdRoute
+  '/admin/trobada/$id': typeof AdminTrobadaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/admin/resum': typeof AdminResumRoute
   '/admin': typeof AdminIndexRoute
   '/admin/restaurant/$id': typeof AdminRestaurantIdRoute
+  '/admin/trobada/$id': typeof AdminTrobadaIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/admin/resum': typeof AdminResumRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/restaurant/$id': typeof AdminRestaurantIdRoute
+  '/admin/trobada/$id': typeof AdminTrobadaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/admin/resum'
     | '/admin/'
     | '/admin/restaurant/$id'
+    | '/admin/trobada/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/admin/resum'
     | '/admin'
     | '/admin/restaurant/$id'
+    | '/admin/trobada/$id'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/admin/resum'
     | '/admin/'
     | '/admin/restaurant/$id'
+    | '/admin/trobada/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   AdminResumRoute: typeof AdminResumRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminRestaurantIdRoute: typeof AdminRestaurantIdRoute
+  AdminTrobadaIdRoute: typeof AdminTrobadaIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRestaurantIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/trobada/$id': {
+      id: '/admin/trobada/$id'
+      path: '/admin/trobada/$id'
+      fullPath: '/admin/trobada/$id'
+      preLoaderRoute: typeof AdminTrobadaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -267,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminResumRoute: AdminResumRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminRestaurantIdRoute: AdminRestaurantIdRoute,
+  AdminTrobadaIdRoute: AdminTrobadaIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
