@@ -58,6 +58,24 @@ export function buildEvent(input: EventInput): { ok: true; event: EventDraft } |
   return { ok: true, event: { name, restaurantId: r.id, restaurantName: r.name, menu: r.categories, dishCount: r.dishCount, dateTime: input.dateTime, deadline: input.deadline, budgetCents, extraCents } };
 }
 
+/** Final del dia límit (23:59) a l'hora local. */
+const endOfDay = (date: string) => { const d = parse(date); d.setHours(23, 59, 59, 999); return d; };
+
+/** Estat que veuen les persones: una trobada oberta es tanca sola quan s'acaba el termini. No s'escriu res a la base de dades. */
+export function effectiveStatus(status: EventStatus, deadline: string, now: Date = new Date()): { status: EventStatus; autoClosed: boolean } {
+  if (status === "open" && deadline && now > endOfDay(deadline)) return { status: "closed", autoClosed: true };
+  return { status, autoClosed: false };
+}
+export const deadlinePassed = (deadline: string, now: Date = new Date()) => !!deadline && now > endOfDay(deadline);
+
+/** Valida la nova data límit en tornar a obrir les comandes. */
+export function validateNewDeadline(newDeadline: string, eventDateTime: string, now: Date = new Date()): { ok: true } | { ok: false; error: string } {
+  if (!validDate(newDeadline)) return { ok: false, error: "Tria la nova data límit." };
+  if (deadlinePassed(newDeadline, now)) return { ok: false, error: "La data límit ha de ser d'avui o d'un dia futur." };
+  if (newDeadline > eventDateTime.slice(0, 10)) return { ok: false, error: "La data límit no pot ser posterior a la trobada. Si la trobada s'ha posposat, primer modifica la seva data." };
+  return { ok: true };
+}
+
 const NEXT: Record<EventStatus, EventStatus[]> = { draft: ["open"], open: ["closed", "done"], closed: ["open", "done"], done: [] };
 export const canTransition = (from: EventStatus, to: EventStatus) => NEXT[from].includes(to);
 
@@ -130,4 +148,14 @@ export async function createEvent(uid: string, id: string, publicCode: string, e
 
 export async function setEventStatus(uid: string, id: string, status: EventStatus) {
   await updateDoc(doc(eventsPath(uid), id), { status, updatedAt: serverTimestamp() });
+}
+
+/** Modifica totes les dades d'una trobada (l'estat i l'enllaç no canvien). */
+export async function updateEvent(uid: string, id: string, event: EventDraft) {
+  await updateDoc(doc(eventsPath(uid), id), { ...event, updatedAt: serverTimestamp() });
+}
+
+/** Torna a obrir les comandes; si cal, amb una nova data límit. */
+export async function reopenEvent(uid: string, id: string, newDeadline?: string) {
+  await updateDoc(doc(eventsPath(uid), id), { status: "open", ...(newDeadline ? { deadline: newDeadline } : {}), updatedAt: serverTimestamp() });
 }

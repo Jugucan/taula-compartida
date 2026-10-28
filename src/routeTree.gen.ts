@@ -19,6 +19,8 @@ import { Route as AdminCartaRouteImport } from './routes/admin.carta'
 import { Route as AdminComandesRouteImport } from './routes/admin.comandes'
 import { Route as AdminNovaRouteImport } from './routes/admin.nova'
 import { Route as AdminResumRouteImport } from './routes/admin.resum'
+import { Route as AdminCopiarTrobadaIdRouteImport } from './routes/admin.copiar-trobada.$id'
+import { Route as AdminEditarTrobadaIdRouteImport } from './routes/admin.editar-trobada.$id'
 import { Route as AdminRestaurantIdRouteImport } from './routes/admin.restaurant.$id'
 import { Route as AdminTrobadaIdRouteImport } from './routes/admin.trobada.$id'
 
@@ -72,6 +74,16 @@ const AdminResumRoute = AdminResumRouteImport.update({
   path: '/admin/resum',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCopiarTrobadaIdRoute = AdminCopiarTrobadaIdRouteImport.update({
+  id: '/admin/copiar-trobada/$id',
+  path: '/admin/copiar-trobada/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminEditarTrobadaIdRoute = AdminEditarTrobadaIdRouteImport.update({
+  id: '/admin/editar-trobada/$id',
+  path: '/admin/editar-trobada/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRestaurantIdRoute = AdminRestaurantIdRouteImport.update({
   id: '/admin/restaurant/$id',
   path: '/admin/restaurant/$id',
@@ -94,6 +106,8 @@ export interface FileRoutesByFullPath {
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/copiar-trobada/$id': typeof AdminCopiarTrobadaIdRoute
+  '/admin/editar-trobada/$id': typeof AdminEditarTrobadaIdRoute
   '/admin/restaurant/$id': typeof AdminRestaurantIdRoute
   '/admin/trobada/$id': typeof AdminTrobadaIdRoute
 }
@@ -108,6 +122,8 @@ export interface FileRoutesByTo {
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/copiar-trobada/$id': typeof AdminCopiarTrobadaIdRoute
+  '/admin/editar-trobada/$id': typeof AdminEditarTrobadaIdRoute
   '/admin/restaurant/$id': typeof AdminRestaurantIdRoute
   '/admin/trobada/$id': typeof AdminTrobadaIdRoute
 }
@@ -123,6 +139,8 @@ export interface FileRoutesById {
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/copiar-trobada/$id': typeof AdminCopiarTrobadaIdRoute
+  '/admin/editar-trobada/$id': typeof AdminEditarTrobadaIdRoute
   '/admin/restaurant/$id': typeof AdminRestaurantIdRoute
   '/admin/trobada/$id': typeof AdminTrobadaIdRoute
 }
@@ -139,6 +157,8 @@ export interface FileRouteTypes {
     | '/admin/nova'
     | '/admin/resum'
     | '/admin/'
+    | '/admin/copiar-trobada/$id'
+    | '/admin/editar-trobada/$id'
     | '/admin/restaurant/$id'
     | '/admin/trobada/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +173,8 @@ export interface FileRouteTypes {
     | '/admin/nova'
     | '/admin/resum'
     | '/admin'
+    | '/admin/copiar-trobada/$id'
+    | '/admin/editar-trobada/$id'
     | '/admin/restaurant/$id'
     | '/admin/trobada/$id'
   id:
@@ -167,6 +189,8 @@ export interface FileRouteTypes {
     | '/admin/nova'
     | '/admin/resum'
     | '/admin/'
+    | '/admin/copiar-trobada/$id'
+    | '/admin/editar-trobada/$id'
     | '/admin/restaurant/$id'
     | '/admin/trobada/$id'
   fileRoutesById: FileRoutesById
@@ -182,6 +206,8 @@ export interface RootRouteChildren {
   AdminNovaRoute: typeof AdminNovaRoute
   AdminResumRoute: typeof AdminResumRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminCopiarTrobadaIdRoute: typeof AdminCopiarTrobadaIdRoute
+  AdminEditarTrobadaIdRoute: typeof AdminEditarTrobadaIdRoute
   AdminRestaurantIdRoute: typeof AdminRestaurantIdRoute
   AdminTrobadaIdRoute: typeof AdminTrobadaIdRoute
 }
@@ -258,6 +284,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminResumRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/copiar-trobada/$id': {
+      id: '/admin/copiar-trobada/$id'
+      path: '/admin/copiar-trobada/$id'
+      fullPath: '/admin/copiar-trobada/$id'
+      preLoaderRoute: typeof AdminCopiarTrobadaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/editar-trobada/$id': {
+      id: '/admin/editar-trobada/$id'
+      path: '/admin/editar-trobada/$id'
+      fullPath: '/admin/editar-trobada/$id'
+      preLoaderRoute: typeof AdminEditarTrobadaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/restaurant/$id': {
       id: '/admin/restaurant/$id'
       path: '/admin/restaurant/$id'
@@ -286,6 +326,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminNovaRoute: AdminNovaRoute,
   AdminResumRoute: AdminResumRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminCopiarTrobadaIdRoute: AdminCopiarTrobadaIdRoute,
+  AdminEditarTrobadaIdRoute: AdminEditarTrobadaIdRoute,
   AdminRestaurantIdRoute: AdminRestaurantIdRoute,
   AdminTrobadaIdRoute: AdminTrobadaIdRoute,
 }

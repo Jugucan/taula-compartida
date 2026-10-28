@@ -3,7 +3,7 @@ import { ArrowRight, CalendarDays, ListChecks, PlusCircle, Receipt } from "lucid
 import { AdminLayout, adminHead } from "@/components/app/AdminLayout";
 import { StatusBadge } from "@/components/app/primitives";
 import { useAdminUid } from "@/components/app/AdminGate";
-import { formatEventDate } from "@/lib/events";
+import { effectiveStatus, formatEventDate } from "@/lib/events";
 import { useEvents } from "@/lib/use-events";
 
 export const Route = createFileRoute("/admin/")({
@@ -57,7 +57,7 @@ function RecentEvents() {
               <p className="mt-1 flex items-center gap-2 text-muted-foreground"><CalendarDays className="size-4" aria-hidden /> {formatEventDate(m.dateTime)} · {m.restaurantName}</p>
             </div>
             <div className="flex items-center gap-4">
-              <StatusBadge status={m.status} />
+              <StatusBadge status={effectiveStatus(m.status, m.deadline).status} />
               <ArrowRight className="hidden size-5 text-muted-foreground sm:block" aria-hidden />
             </div>
           </Link>

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { AdminLayout, adminHead } from "@/components/app/AdminLayout";
 import { useAdminUid } from "@/components/app/AdminGate";
 import { Action, actionVariants, StatusBadge } from "@/components/app/primitives";
-import { canTransition, formatDeadline, formatEventDate, setEventStatus, type EventStatus, type StoredEvent } from "@/lib/events";
+import { canTransition, deadlinePassed, effectiveStatus, formatDeadline, formatEventDate, reopenEvent, setEventStatus, validateNewDeadline, type EventStatus, type StoredEvent } from "@/lib/events";
 import { centsToInput } from "@/lib/money";
 import { useEvent } from "@/lib/use-events";
 
@@ -29,10 +29,6 @@ const helper: Record<EventStatus, string> = {
   closed: "Les comandes estan tancades: els convidats ja no poden fer canvis. Pots tornar-les a obrir.",
   done: "La trobada ha acabat. Es conserva a l'historial.",
 };
-const actions: { to: EventStatus; label: string }[] = [
-  { to: "open", label: "Obrir les comandes" },
-  { to: "closed", label: "Tancar les comandes" },
-];
 
 function TrobadaLoader({ id }: { id: string }) {
   const uid = useAdminUid();
@@ -58,6 +54,9 @@ function TrobadaView({ event, uid }: { event: StoredEvent; uid: string }) {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [confirmDone, setConfirmDone] = useState(false);
+  const [askDate, setAskDate] = useState(false);
+  const [newDeadline, setNewDeadline] = useState("");
+  const { status: shown, autoClosed } = effectiveStatus(event.status, event.deadline);
   const link = `${typeof window === "undefined" ? "" : window.location.origin}/t/${event.publicCode}`;
 
   async function change(to: EventStatus) {
@@ -76,6 +75,36 @@ function TrobadaView({ event, uid }: { event: StoredEvent; uid: string }) {
     }
   }
 
+  async function open(deadline?: string) {
+    setSaving(true);
+    setError("");
+    try {
+      await reopenEvent(uid, event.id, deadline);
+      queryClient.setQueryData<StoredEvent>(["event", uid, event.id], { ...event, status: "open", deadline: deadline ?? event.deadline });
+      await queryClient.invalidateQueries({ queryKey: ["events", uid] });
+      setAskDate(false);
+    } catch {
+      setError("No s'han pogut obrir les comandes. Torna-ho a provar.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function startOpen() {
+    if (deadlinePassed(event.deadline)) {
+      setNewDeadline("");
+      setAskDate(true);
+    } else {
+      void open();
+    }
+  }
+
+  function confirmOpenWithDate() {
+    const check = validateNewDeadline(newDeadline, event.dateTime);
+    if (!check.ok) return setError(check.error);
+    void open(newDeadline);
+  }
+
   async function copy() {
     try {
       await navigator.clipboard.writeText(link);
@@ -91,7 +120,7 @@ function TrobadaView({ event, uid }: { event: StoredEvent; uid: string }) {
       <section className="rounded-3xl border bg-card p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-2xl font-semibold">{event.name}</h2>
-          <StatusBadge status={event.status} />
+          <StatusBadge status={shown} />
         </div>
         <ul className="mt-4 space-y-2 text-lg text-muted-foreground">
           <li className="flex items-center gap-3"><MapPin className="size-5 shrink-0" aria-hidden /> {event.restaurantName}</li>
@@ -105,18 +134,28 @@ function TrobadaView({ event, uid }: { event: StoredEvent; uid: string }) {
       </section>
 
       <section className="rounded-3xl border bg-card p-6">
-        <p className="text-lg">{helper[event.status]}</p>
+        <p className="text-lg">{autoClosed ? `Les comandes es van tancar soles perquè el termini va acabar el ${formatDeadline(event.deadline)}. Les pots tornar a obrir triant una nova data límit.` : helper[shown]}</p>
         {error && (
           <div role="alert" className="mt-4 flex gap-3 rounded-2xl bg-destructive-soft p-4 text-destructive">
             <AlertTriangle className="size-5 shrink-0" aria-hidden /><p className="font-semibold">{error}</p>
           </div>
         )}
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-          {actions.filter((a) => canTransition(event.status, a.to)).map((a) => (
-            <Action key={a.to} onClick={() => change(a.to)} disabled={saving}>{event.status === "closed" && a.to === "open" ? "Tornar a obrir les comandes" : a.label}</Action>
-          ))}
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          {(shown === "draft" || shown === "closed") && !askDate && <Action onClick={startOpen} disabled={saving}>{shown === "draft" ? "Obrir les comandes" : "Tornar a obrir les comandes"}</Action>}
+          {shown === "open" && <Action onClick={() => change("closed")} disabled={saving}>Tancar les comandes</Action>}
           {canTransition(event.status, "done") && !confirmDone && <Action variant="outline" onClick={() => setConfirmDone(true)} disabled={saving}>Finalitzar la trobada</Action>}
         </div>
+        {askDate && (
+          <div className="mt-4 rounded-2xl bg-secondary p-4">
+            <label htmlFor="nova-data-limit" className="block text-lg font-bold">Fins quan es poden triar els plats?</label>
+            <input id="nova-data-limit" type="date" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} className="mt-2 min-h-14 w-full rounded-xl border-2 border-input bg-card px-4 text-lg outline-none focus:border-primary sm:max-w-xs" />
+            <p className="mt-2 text-muted-foreground">La trobada és el {formatEventDate(event.dateTime)}. Si s'ha posposat, primer <Link to="/admin/editar-trobada/$id" params={{ id: event.id }} className="font-semibold text-primary underline">modifica'n la data</Link>.</p>
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+              <Action variant="outline" onClick={() => { setAskDate(false); setError(""); }} disabled={saving}>Cancel·lar</Action>
+              <Action onClick={confirmOpenWithDate} disabled={saving}>{saving ? "Desant…" : "Obrir les comandes"}</Action>
+            </div>
+          </div>
+        )}
         {confirmDone && (
           <div role="alertdialog" aria-label="Confirma que vols finalitzar la trobada" className="mt-4 rounded-2xl bg-secondary p-4">
             <p className="font-semibold">Segur que vols finalitzar la trobada? Després ja no es pot tornar a obrir.</p>
@@ -126,6 +165,15 @@ function TrobadaView({ event, uid }: { event: StoredEvent; uid: string }) {
             </div>
           </div>
         )}
+      </section>
+
+      <section className="rounded-3xl border bg-card p-6">
+        <h2 className="text-xl font-semibold">Canviar o repetir aquesta trobada</h2>
+        <p className="mt-2 text-muted-foreground">Pots modificar-ho tot (també si la trobada es posposa) o crear-ne una còpia per a la propera vegada.</p>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <Link to="/admin/editar-trobada/$id" params={{ id: event.id }} className={actionVariants({ variant: "outline" })}>Modificar la trobada</Link>
+          <Link to="/admin/copiar-trobada/$id" params={{ id: event.id }} className={actionVariants({ variant: "outline" })}>Copiar aquesta trobada</Link>
+        </div>
       </section>
 
       <section className="rounded-3xl border bg-card p-6">
