@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildEvent, canTransition, formatDeadline, formatEventDate, newPublicCode } from "@/lib/events";
+import { buildEvent, canTransition, deadlinePassed, effectiveStatus, formatDeadline, formatEventDate, newPublicCode, validateNewDeadline } from "@/lib/events";
 import type { StoredRestaurant } from "@/lib/restaurants";
 
 const restaurant: StoredRestaurant = { id: "r1", name: "Prova", url: "", dishCount: 1, categories: [{ id: "primers", name: "Primers", dishes: [{ id: "a", name: "Pa", price: 450 }] }] };
@@ -53,13 +53,12 @@ describe("codi públic i dates", () => {
   });
 });
 
-import { deadlinePassed, effectiveStatus, validateNewDeadline } from "@/lib/events";
 
-describe("tancament automàtic", () => {
-  const dia = (y: number, m: number, d: number, h = 12) => new Date(y, m - 1, d, h, 0);
+describe("tancament automàtic (hora de Catalunya)", () => {
+  // A l'hivern Catalunya és UTC+1: les 23:59 locals són les 22:59 UTC.
   it("una trobada oberta es tanca sola quan acaba el dia límit", () => {
-    expect(effectiveStatus("open", "2026-12-15", dia(2026, 12, 15, 23))).toEqual({ status: "open", autoClosed: false });
-    expect(effectiveStatus("open", "2026-12-15", dia(2026, 12, 16, 0))).toEqual({ status: "closed", autoClosed: true });
+    expect(effectiveStatus("open", "2026-12-15", new Date("2026-12-15T22:59:00Z"))).toEqual({ status: "open", autoClosed: false });
+    expect(effectiveStatus("open", "2026-12-15", new Date("2026-12-15T23:00:00Z"))).toEqual({ status: "closed", autoClosed: true });
   });
   it("no toca els altres estats", () => {
     expect(effectiveStatus("draft", "2020-01-01").status).toBe("draft");
@@ -67,13 +66,17 @@ describe("tancament automàtic", () => {
     expect(effectiveStatus("done", "2020-01-01").status).toBe("done");
   });
   it("saps si el termini ja ha passat", () => {
-    expect(deadlinePassed("2026-12-15", dia(2026, 12, 16))).toBe(true);
-    expect(deadlinePassed("2026-12-15", dia(2026, 12, 14))).toBe(false);
+    expect(deadlinePassed("2026-12-15", new Date("2026-12-16T10:00:00Z"))).toBe(true);
+    expect(deadlinePassed("2026-12-15", new Date("2026-12-14T10:00:00Z"))).toBe(false);
+  });
+  it("a l'estiu (UTC+2) el canvi de dia és a les 22:00 UTC", () => {
+    expect(deadlinePassed("2026-07-15", new Date("2026-07-15T21:59:00Z"))).toBe(false);
+    expect(deadlinePassed("2026-07-15", new Date("2026-07-15T22:00:00Z"))).toBe(true);
   });
 });
 
 describe("tornar a obrir amb una nova data límit", () => {
-  const ara = new Date(2026, 11, 16, 10, 0);
+  const ara = new Date("2026-12-16T10:00:00Z");
   it("accepta una data futura anterior a la trobada", () => {
     expect(validateNewDeadline("2026-12-20", "2026-12-23T21:00", ara).ok).toBe(true);
     expect(validateNewDeadline("2026-12-16", "2026-12-23T21:00", ara).ok).toBe(true);

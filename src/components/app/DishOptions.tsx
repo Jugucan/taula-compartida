@@ -1,8 +1,8 @@
 import type { Dish } from "@/data/demo";
-import { useOrder } from "@/lib/order-store";
+import { useGuest } from "@/lib/guest-order";
 
 export function DishOptions({ dish, qty }: { dish: Dish; qty: number }) {
-  const { selections, setOption } = useOrder();
+  const { selections, setOption } = useGuest();
   if (!dish.options || qty < 1) return null;
   const options = dish.options;
   return <div className="mt-4 grid gap-3">

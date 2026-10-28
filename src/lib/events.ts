@@ -7,7 +7,8 @@ import { getClientDb } from "@/lib/firebase-client";
 import { parseEuroToCents } from "@/lib/money";
 import type { StoredRestaurant } from "@/lib/restaurants";
 
-export type EventStatus = "draft" | "open" | "closed" | "done";
+import { deadlinePassed, effectiveStatus, todayInMadrid, type EventStatus } from "@/lib/event-time";
+export { deadlinePassed, effectiveStatus, todayInMadrid, type EventStatus };
 
 export type StoredEvent = {
   id: string;
@@ -57,16 +58,6 @@ export function buildEvent(input: EventInput): { ok: true; event: EventDraft } |
 
   return { ok: true, event: { name, restaurantId: r.id, restaurantName: r.name, menu: r.categories, dishCount: r.dishCount, dateTime: input.dateTime, deadline: input.deadline, budgetCents, extraCents } };
 }
-
-/** Final del dia límit (23:59) a l'hora local. */
-const endOfDay = (date: string) => { const d = parse(date); d.setHours(23, 59, 59, 999); return d; };
-
-/** Estat que veuen les persones: una trobada oberta es tanca sola quan s'acaba el termini. No s'escriu res a la base de dades. */
-export function effectiveStatus(status: EventStatus, deadline: string, now: Date = new Date()): { status: EventStatus; autoClosed: boolean } {
-  if (status === "open" && deadline && now > endOfDay(deadline)) return { status: "closed", autoClosed: true };
-  return { status, autoClosed: false };
-}
-export const deadlinePassed = (deadline: string, now: Date = new Date()) => !!deadline && now > endOfDay(deadline);
 
 /** Valida la nova data límit en tornar a obrir les comandes. */
 export function validateNewDeadline(newDeadline: string, eventDateTime: string, now: Date = new Date()): { ok: true } | { ok: false; error: string } {

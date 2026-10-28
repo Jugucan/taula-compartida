@@ -1,4 +1,4 @@
-import type { Line } from "@/lib/order-store";
+import type { Line } from "@/lib/guest-order";
 
 export function OrderLines({ lines }: { lines: Line[] }) {
   return (

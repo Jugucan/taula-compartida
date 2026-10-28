@@ -1,17 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
-import { DemoRibbon } from "./primitives";
+import { useGuest } from "@/lib/guest-order";
 
-export function GuestLayout({ children, back, step }: { children: ReactNode; back?: { to: "/carta" | "/revisio"; label: string }; step?: number }) {
+export function GuestLayout({ children, back, step }: { children: ReactNode; back?: { to: "carta" | "revisio"; label: string }; step?: number }) {
+  const { code } = useGuest();
   return (
     <div className="min-h-screen">
-      <DemoRibbon />
       {(back || step) && (
         <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
           <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-3">
             {back ? (
-              <Link to={back.to} className="inline-flex min-h-12 items-center gap-2 rounded-full pr-3 text-base font-semibold hover:text-primary">
+              <Link to={back.to === "carta" ? "/t/$code" : "/t/$code/revisio"} params={{ code }} className="inline-flex min-h-12 items-center gap-2 rounded-full pr-3 text-base font-semibold hover:text-primary">
                 <ArrowLeft className="size-5" aria-hidden /> {back.label}
               </Link>
             ) : <span />}

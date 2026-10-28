@@ -10,43 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CartaRouteImport } from './routes/carta'
-import { Route as DadesRouteImport } from './routes/dades'
-import { Route as EnviadaRouteImport } from './routes/enviada'
-import { Route as RevisioRouteImport } from './routes/revisio'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCartaRouteImport } from './routes/admin.carta'
 import { Route as AdminComandesRouteImport } from './routes/admin.comandes'
 import { Route as AdminNovaRouteImport } from './routes/admin.nova'
 import { Route as AdminResumRouteImport } from './routes/admin.resum'
+import { Route as TCodeRouteImport } from './routes/t.$code'
 import { Route as AdminCopiarTrobadaIdRouteImport } from './routes/admin.copiar-trobada.$id'
 import { Route as AdminEditarTrobadaIdRouteImport } from './routes/admin.editar-trobada.$id'
 import { Route as AdminRestaurantIdRouteImport } from './routes/admin.restaurant.$id'
 import { Route as AdminTrobadaIdRouteImport } from './routes/admin.trobada.$id'
+import { Route as TCodeIndexRouteImport } from './routes/t.$code.index'
+import { Route as TCodeDadesRouteImport } from './routes/t.$code.dades'
+import { Route as TCodeEnviadaRouteImport } from './routes/t.$code.enviada'
+import { Route as TCodeRevisioRouteImport } from './routes/t.$code.revisio'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CartaRoute = CartaRouteImport.update({
-  id: '/carta',
-  path: '/carta',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DadesRoute = DadesRouteImport.update({
-  id: '/dades',
-  path: '/dades',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnviadaRoute = EnviadaRouteImport.update({
-  id: '/enviada',
-  path: '/enviada',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RevisioRoute = RevisioRouteImport.update({
-  id: '/revisio',
-  path: '/revisio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -74,6 +55,11 @@ const AdminResumRoute = AdminResumRouteImport.update({
   path: '/admin/resum',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TCodeRoute = TCodeRouteImport.update({
+  id: '/t/$code',
+  path: '/t/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminCopiarTrobadaIdRoute = AdminCopiarTrobadaIdRouteImport.update({
   id: '/admin/copiar-trobada/$id',
   path: '/admin/copiar-trobada/$id',
@@ -94,29 +80,46 @@ const AdminTrobadaIdRoute = AdminTrobadaIdRouteImport.update({
   path: '/admin/trobada/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TCodeIndexRoute = TCodeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TCodeRoute,
+} as any)
+const TCodeDadesRoute = TCodeDadesRouteImport.update({
+  id: '/dades',
+  path: '/dades',
+  getParentRoute: () => TCodeRoute,
+} as any)
+const TCodeEnviadaRoute = TCodeEnviadaRouteImport.update({
+  id: '/enviada',
+  path: '/enviada',
+  getParentRoute: () => TCodeRoute,
+} as any)
+const TCodeRevisioRoute = TCodeRevisioRouteImport.update({
+  id: '/revisio',
+  path: '/revisio',
+  getParentRoute: () => TCodeRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/carta': typeof CartaRoute
-  '/dades': typeof DadesRoute
-  '/enviada': typeof EnviadaRoute
-  '/revisio': typeof RevisioRoute
   '/admin/carta': typeof AdminCartaRoute
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
+  '/t/$code': typeof TCodeRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/admin/copiar-trobada/$id': typeof AdminCopiarTrobadaIdRoute
   '/admin/editar-trobada/$id': typeof AdminEditarTrobadaIdRoute
   '/admin/restaurant/$id': typeof AdminRestaurantIdRoute
   '/admin/trobada/$id': typeof AdminTrobadaIdRoute
+  '/t/$code/dades': typeof TCodeDadesRoute
+  '/t/$code/enviada': typeof TCodeEnviadaRoute
+  '/t/$code/revisio': typeof TCodeRevisioRoute
+  '/t/$code/': typeof TCodeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/carta': typeof CartaRoute
-  '/dades': typeof DadesRoute
-  '/enviada': typeof EnviadaRoute
-  '/revisio': typeof RevisioRoute
   '/admin/carta': typeof AdminCartaRoute
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
@@ -126,48 +129,50 @@ export interface FileRoutesByTo {
   '/admin/editar-trobada/$id': typeof AdminEditarTrobadaIdRoute
   '/admin/restaurant/$id': typeof AdminRestaurantIdRoute
   '/admin/trobada/$id': typeof AdminTrobadaIdRoute
+  '/t/$code/dades': typeof TCodeDadesRoute
+  '/t/$code/enviada': typeof TCodeEnviadaRoute
+  '/t/$code/revisio': typeof TCodeRevisioRoute
+  '/t/$code': typeof TCodeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/carta': typeof CartaRoute
-  '/dades': typeof DadesRoute
-  '/enviada': typeof EnviadaRoute
-  '/revisio': typeof RevisioRoute
   '/admin/carta': typeof AdminCartaRoute
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
+  '/t/$code': typeof TCodeRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/admin/copiar-trobada/$id': typeof AdminCopiarTrobadaIdRoute
   '/admin/editar-trobada/$id': typeof AdminEditarTrobadaIdRoute
   '/admin/restaurant/$id': typeof AdminRestaurantIdRoute
   '/admin/trobada/$id': typeof AdminTrobadaIdRoute
+  '/t/$code/dades': typeof TCodeDadesRoute
+  '/t/$code/enviada': typeof TCodeEnviadaRoute
+  '/t/$code/revisio': typeof TCodeRevisioRoute
+  '/t/$code/': typeof TCodeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/carta'
-    | '/dades'
-    | '/enviada'
-    | '/revisio'
     | '/admin/carta'
     | '/admin/comandes'
     | '/admin/nova'
     | '/admin/resum'
+    | '/t/$code'
     | '/admin/'
     | '/admin/copiar-trobada/$id'
     | '/admin/editar-trobada/$id'
     | '/admin/restaurant/$id'
     | '/admin/trobada/$id'
+    | '/t/$code/dades'
+    | '/t/$code/enviada'
+    | '/t/$code/revisio'
+    | '/t/$code/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/carta'
-    | '/dades'
-    | '/enviada'
-    | '/revisio'
     | '/admin/carta'
     | '/admin/comandes'
     | '/admin/nova'
@@ -177,34 +182,36 @@ export interface FileRouteTypes {
     | '/admin/editar-trobada/$id'
     | '/admin/restaurant/$id'
     | '/admin/trobada/$id'
+    | '/t/$code/dades'
+    | '/t/$code/enviada'
+    | '/t/$code/revisio'
+    | '/t/$code'
   id:
     | '__root__'
     | '/'
-    | '/carta'
-    | '/dades'
-    | '/enviada'
-    | '/revisio'
     | '/admin/carta'
     | '/admin/comandes'
     | '/admin/nova'
     | '/admin/resum'
+    | '/t/$code'
     | '/admin/'
     | '/admin/copiar-trobada/$id'
     | '/admin/editar-trobada/$id'
     | '/admin/restaurant/$id'
     | '/admin/trobada/$id'
+    | '/t/$code/dades'
+    | '/t/$code/enviada'
+    | '/t/$code/revisio'
+    | '/t/$code/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CartaRoute: typeof CartaRoute
-  DadesRoute: typeof DadesRoute
-  EnviadaRoute: typeof EnviadaRoute
-  RevisioRoute: typeof RevisioRoute
   AdminCartaRoute: typeof AdminCartaRoute
   AdminComandesRoute: typeof AdminComandesRoute
   AdminNovaRoute: typeof AdminNovaRoute
   AdminResumRoute: typeof AdminResumRoute
+  TCodeRoute: typeof TCodeRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCopiarTrobadaIdRoute: typeof AdminCopiarTrobadaIdRoute
   AdminEditarTrobadaIdRoute: typeof AdminEditarTrobadaIdRoute
@@ -219,34 +226,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/carta': {
-      id: '/carta'
-      path: '/carta'
-      fullPath: '/carta'
-      preLoaderRoute: typeof CartaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dades': {
-      id: '/dades'
-      path: '/dades'
-      fullPath: '/dades'
-      preLoaderRoute: typeof DadesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/enviada': {
-      id: '/enviada'
-      path: '/enviada'
-      fullPath: '/enviada'
-      preLoaderRoute: typeof EnviadaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/revisio': {
-      id: '/revisio'
-      path: '/revisio'
-      fullPath: '/revisio'
-      preLoaderRoute: typeof RevisioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -284,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminResumRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/t/$code': {
+      id: '/t/$code'
+      path: '/t/$code'
+      fullPath: '/t/$code'
+      preLoaderRoute: typeof TCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/copiar-trobada/$id': {
       id: '/admin/copiar-trobada/$id'
       path: '/admin/copiar-trobada/$id'
@@ -312,19 +298,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTrobadaIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/t/$code/': {
+      id: '/t/$code/'
+      path: '/'
+      fullPath: '/t/$code/'
+      preLoaderRoute: typeof TCodeIndexRouteImport
+      parentRoute: typeof TCodeRoute
+    }
+    '/t/$code/dades': {
+      id: '/t/$code/dades'
+      path: '/dades'
+      fullPath: '/t/$code/dades'
+      preLoaderRoute: typeof TCodeDadesRouteImport
+      parentRoute: typeof TCodeRoute
+    }
+    '/t/$code/enviada': {
+      id: '/t/$code/enviada'
+      path: '/enviada'
+      fullPath: '/t/$code/enviada'
+      preLoaderRoute: typeof TCodeEnviadaRouteImport
+      parentRoute: typeof TCodeRoute
+    }
+    '/t/$code/revisio': {
+      id: '/t/$code/revisio'
+      path: '/revisio'
+      fullPath: '/t/$code/revisio'
+      preLoaderRoute: typeof TCodeRevisioRouteImport
+      parentRoute: typeof TCodeRoute
+    }
   }
 }
 
+interface TCodeRouteChildren {
+  TCodeDadesRoute: typeof TCodeDadesRoute
+  TCodeEnviadaRoute: typeof TCodeEnviadaRoute
+  TCodeRevisioRoute: typeof TCodeRevisioRoute
+  TCodeIndexRoute: typeof TCodeIndexRoute
+}
+
+const TCodeRouteChildren: TCodeRouteChildren = {
+  TCodeDadesRoute: TCodeDadesRoute,
+  TCodeEnviadaRoute: TCodeEnviadaRoute,
+  TCodeRevisioRoute: TCodeRevisioRoute,
+  TCodeIndexRoute: TCodeIndexRoute,
+}
+
+const TCodeRouteWithChildren = TCodeRoute._addFileChildren(TCodeRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CartaRoute: CartaRoute,
-  DadesRoute: DadesRoute,
-  EnviadaRoute: EnviadaRoute,
-  RevisioRoute: RevisioRoute,
   AdminCartaRoute: AdminCartaRoute,
   AdminComandesRoute: AdminComandesRoute,
   AdminNovaRoute: AdminNovaRoute,
   AdminResumRoute: AdminResumRoute,
+  TCodeRoute: TCodeRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   AdminCopiarTrobadaIdRoute: AdminCopiarTrobadaIdRoute,
   AdminEditarTrobadaIdRoute: AdminEditarTrobadaIdRoute,
