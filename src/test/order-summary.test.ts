@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { demoMenu } from "@/data/demo";
-import { guestsCsv, summarize, summaryCsv } from "@/lib/order-summary";
+import { guestNames, guestsCsv, optionCounts, summarize, summaryCsv } from "@/lib/order-summary";
 import type { StoredOrder } from "@/lib/orders";
 
 const item = (dishId: string, name: string, unit: number, qty: number, options: string[] = []) => ({ dishId, name, unitPriceCents: unit, qty, options, subtotalCents: unit * qty });
@@ -48,8 +48,8 @@ describe("CSV", () => {
   it("usa ; i decimals amb coma, i té BOM per a Excel", () => {
     const csv = summaryCsv(summarize(orders, demoMenu, 0), "Sopar");
     expect(csv.startsWith("\uFEFF")).toBe(true);
-    expect(csv).toContain("Pa amb tomàquet;3;4,50;13,50");
-    expect(csv).toContain(";;;Total;17,50");
+    expect(csv).toContain("Pa amb tomàquet;;3;4,50;13,50");
+    expect(csv).toContain(";;;;Total;17,50");
   });
   it("protegeix contra fórmules i cometes en els noms dels convidats", () => {
     const csv = guestsCsv([order("1", '=HYPERLINK("x")', [item("pa", "Pa", 450, 1)], 'nota; "amb cometes"')]);
@@ -62,5 +62,22 @@ describe("CSV", () => {
     expect(lines).toHaveLength(1 + 3);
     expect(lines[1]).toContain("Sense gluten");
     expect(lines[2]).not.toContain("Sense gluten");
+  });
+});
+
+describe("opcions i noms per plat", () => {
+  const carns = [
+    order("1", "Maria", [item("bistec", "Bistec", 1500, 2, ["Poc fet", "Al punt"])]),
+    order("2", "Pere", [item("bistec", "Bistec", 1500, 1, ["Poc fet"])]),
+  ];
+  it("compta quantes unitats hi ha de cada opció", () => {
+    const line = summarize(carns, demoMenu, 0).lines[0]!;
+    expect(optionCounts(line)).toEqual([{ option: "Poc fet", qty: 2 }, { option: "Al punt", qty: 1 }]);
+  });
+  it("llista qui ha demanat cada plat", () => {
+    expect(guestNames(summarize(carns, demoMenu, 0).lines[0]!)).toBe("Maria (2), Pere");
+  });
+  it("el CSV del resum porta les opcions", () => {
+    expect(summaryCsv(summarize(carns, demoMenu, 0), "Sopar")).toContain("Bistec;Poc fet ×2 / Al punt ×1;3;15,00;45,00");
   });
 });

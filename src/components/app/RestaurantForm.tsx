@@ -99,7 +99,7 @@ export function RestaurantForm({ existing }: { existing?: StoredRestaurant }) {
 
       <section className="rounded-3xl border bg-card p-6">
         <h2 className="text-xl font-semibold">2. Els plats</h2>
-        {existing && <p className="mt-2 text-muted-foreground">Les trobades que ja has creat no canvien: conserven la seva còpia de la carta.</p>}
+        {existing && <p className="mt-2 text-muted-foreground">Les trobades que ja has creat no canvien: conserven la seva còpia de la carta. Per aplicar-hi els canvis, fes servir «Actualitzar la carta» a «Modificar la trobada».</p>}
         <ul className="mt-4 space-y-3">
           {rows.map((d, i) => (
             <li key={d.key} className="grid gap-3 rounded-2xl border-2 border-border bg-card p-4 sm:grid-cols-[9rem_1fr_8rem_auto] sm:items-end">
@@ -114,6 +114,27 @@ export function RestaurantForm({ existing }: { existing?: StoredRestaurant }) {
               <button type="button" onClick={() => setRows((r) => (r.length > 1 ? r.filter((x) => x.key !== d.key) : r))} className="inline-flex min-h-12 items-center gap-2 rounded-full px-3 font-semibold text-destructive hover:bg-destructive-soft">
                 <Trash2 className="size-5" aria-hidden /> Treure
               </button>
+              <div className="sm:col-span-4">
+                {!d.optionsOpen ? (
+                  <button type="button" onClick={() => update(d.key, { optionsOpen: true })} className="font-semibold text-primary underline">
+                    + Aquest plat té opcions (salsa, punt de cocció…)
+                  </button>
+                ) : (
+                  <div className="grid gap-3 rounded-xl bg-secondary p-4 sm:grid-cols-[12rem_1fr]">
+                    <div>
+                      <label htmlFor={`opcio-nom-${d.key}`} className="block font-semibold">Què s'ha de triar?</label>
+                      <input id={`opcio-nom-${d.key}`} placeholder="Punt de cocció" value={d.optionLabel ?? ""} maxLength={30} onChange={(e) => update(d.key, { optionLabel: e.target.value })} className={inputCls + " mt-1"} />
+                    </div>
+                    <div>
+                      <label htmlFor={`opcio-valors-${d.key}`} className="block font-semibold">Les opcions, separades per comes</label>
+                      <input id={`opcio-valors-${d.key}`} placeholder="Poc fet, Al punt, Ben fet" value={d.optionValues ?? ""} onChange={(e) => update(d.key, { optionValues: e.target.value })} className={inputCls + " mt-1"} />
+                    </div>
+                    <button type="button" onClick={() => update(d.key, { optionsOpen: false, optionLabel: "", optionValues: "" })} className="justify-self-start font-semibold text-destructive underline sm:col-span-2">
+                      Treure les opcions d'aquest plat
+                    </button>
+                  </div>
+                )}
+              </div>
             </li>
           ))}
         </ul>

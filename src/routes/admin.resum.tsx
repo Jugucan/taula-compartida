@@ -5,7 +5,8 @@ import { EventPicker, NoEvents, useSelectedEvent } from "@/components/app/EventP
 import { Action } from "@/components/app/primitives";
 import { formatEventDate, type StoredEvent } from "@/lib/events";
 import { formatEuro, plural } from "@/lib/format";
-import { guestsCsv, summarize, summaryCsv } from "@/lib/order-summary";
+import { guestNames, guestsCsv, optionCounts, summarize, summaryCsv } from "@/lib/order-summary";
+import { useState } from "react";
 import { useOrders } from "@/lib/use-orders";
 
 export const Route = createFileRoute("/admin/resum")({
@@ -48,6 +49,7 @@ function Content({ t }: { t: string | undefined }) {
 
 function Resum({ uid, event }: { uid: string; event: StoredEvent }) {
   const { data: orders = [], isPending, isError } = useOrders(uid, event.id);
+  const [showNames, setShowNames] = useState(true);
   const s = summarize(orders, event.menu, event.extraCents);
   const budget = event.budgetCents ?? 0;
   const diff = budget - s.totalCents;
@@ -63,6 +65,11 @@ function Resum({ uid, event }: { uid: string; event: StoredEvent }) {
         <Action variant="outline" size="md" disabled={orders.length === 0} onClick={() => download(fileName(event.name, "resum"), summaryCsv(s, event.name))}><Download className="size-5" aria-hidden /> CSV del resum</Action>
         <Action variant="outline" size="md" disabled={orders.length === 0} onClick={() => download(fileName(event.name, "per-persona"), guestsCsv(orders))}><Download className="size-5" aria-hidden /> CSV per persona</Action>
       </div>
+
+      <label className="no-print mb-6 flex items-center gap-3 text-lg">
+        <input type="checkbox" checked={showNames} onChange={(e) => setShowNames(e.target.checked)} className="size-6 accent-[var(--primary)]" />
+        <span>Mostrar qui ha demanat cada plat <span className="text-muted-foreground">(desmarca-ho si el resum és per al restaurant)</span></span>
+      </label>
 
       <section className="no-print mb-8 border-y py-6">
         <h2 className="text-2xl font-semibold">Import compartit</h2>
@@ -98,10 +105,10 @@ function Resum({ uid, event }: { uid: string; event: StoredEvent }) {
             <h3 className="font-sans text-sm font-bold uppercase tracking-widest text-primary">{cat.name}</h3>
             <ul className="mt-2 divide-y">
               {cat.lines.map((l) => {
-                const withOptions = l.guests.filter((g) => g.options.length > 0);
+                const options = optionCounts(l);
                 return (
                   <li key={l.key} className="flex justify-between gap-4 py-2.5 text-lg">
-                    <span><span className="tabular inline-block w-10 font-bold">{l.qty}×</span>{l.name} <span className="tabular text-base text-muted-foreground">({formatEuro(l.unitPriceCents)} c/u)</span>{withOptions.length > 0 && <span className="block text-base text-muted-foreground">{withOptions.map((g) => `${g.guest}: ${g.options.join(", ")}`).join(" · ")}</span>}</span>
+                    <span><span className="tabular inline-block w-10 font-bold">{l.qty}×</span>{l.name} <span className="tabular text-base text-muted-foreground">({formatEuro(l.unitPriceCents)} c/u)</span>{options.length > 0 && <span className="block text-base text-primary">{options.map((o) => `${o.option} ×${o.qty}`).join(" · ")}</span>}{showNames && <span className="block text-base text-muted-foreground">{guestNames(l)}</span>}</span>
                     <span className="tabular text-muted-foreground">{formatEuro(l.subtotalCents)}</span>
                   </li>
                 );

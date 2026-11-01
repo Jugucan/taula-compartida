@@ -9,12 +9,32 @@ import { getClientDb } from "@/lib/firebase-client";
 export const CATEGORIES = ["Entrants", "Primers", "Segons", "Postres", "Begudes", "Altres"] as const;
 export const MAX_DISHES = 200;
 
-export type DishDraft = { key: string; category: string; name: string; price: string; id?: string };
+export type DishDraft = {
+  key: string; category: string; name: string; price: string; id?: string;
+  optionsOpen?: boolean; optionLabel?: string; optionValues?: string; // opcions: «Punt de cocció» + «Poc fet, Al punt, Ben fet»
+  description?: string; tags?: string[]; // es conserven en modificar (per exemple, si venen d'una carta importada)
+};
 export type StoredRestaurant = { id: string; name: string; url: string; categories: MenuCategory[]; dishCount: number };
 
 type BuildResult = { ok: true; categories: MenuCategory[]; dishCount: number } | { ok: false; error: string };
 
 const slug = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/** «Poc fet, Al punt, Ben fet» -> ["Poc fet", "Al punt", "Ben fet"]. Retorna null si no hi ha opcions. */
+function parseOptions(dishName: string, label: string, values: string): { ok: true; options: { label: string; values: string[] } | null } | { ok: false; error: string } {
+  if (!values.trim()) return { ok: true, options: null };
+  const list: string[] = [];
+  for (const raw of values.split(/[,;\n]/)) {
+    const v = raw.trim();
+    if (v && !list.some((x) => x.toLowerCase() === v.toLowerCase())) list.push(v);
+  }
+  if (list.length < 2) return { ok: false, error: `A «${dishName}», escriu almenys dues opcions separades per comes (per exemple: Poc fet, Al punt, Ben fet).` };
+  if (list.length > 12) return { ok: false, error: `«${dishName}» té massa opcions (màxim 12).` };
+  if (list.some((v) => v.length > 40)) return { ok: false, error: `Alguna opció de «${dishName}» és massa llarga.` };
+  const optionLabel = label.trim() || "Opció";
+  if (optionLabel.length > 30) return { ok: false, error: `El nom de l'opció de «${dishName}» és massa llarg.` };
+  return { ok: true, options: { label: optionLabel, values: list } };
+}
 
 /** Valida els plats escrits i els converteix en una carta amb preus en cèntims. */
 export function buildMenu(drafts: DishDraft[], makeId: () => string = () => crypto.randomUUID().slice(0, 8)): BuildResult {
@@ -29,9 +49,16 @@ export function buildMenu(drafts: DishDraft[], makeId: () => string = () => cryp
     if (name.length > 80) return { ok: false, error: `El nom «${name.slice(0, 20)}…» és massa llarg.` };
     const price = parseEuroToCents(draft.price);
     if (price === null || price <= 0) return { ok: false, error: `Revisa el preu de «${name}». Escriu-lo així: 12,50` };
+    const opts = parseOptions(name, draft.optionLabel ?? "", draft.optionValues ?? "");
+    if (!opts.ok) return opts;
     const category = (CATEGORIES as readonly string[]).includes(draft.category) ? draft.category : "Altres";
     const list = byCategory.get(category) ?? [];
-    list.push({ id: draft.id ?? makeId(), name, price });
+    list.push({
+      id: draft.id ?? makeId(), name, price,
+      ...(draft.description ? { description: draft.description } : {}),
+      ...(draft.tags?.length ? { tags: draft.tags } : {}),
+      ...(opts.options ? { options: opts.options } : {}),
+    });
     byCategory.set(category, list);
   }
 
@@ -70,7 +97,12 @@ export async function saveRestaurant(uid: string, id: string, data: { name: stri
 
 /** Converteix un restaurant desat en files editables (conservant l'identificador de cada plat). */
 export function draftsFromRestaurant(r: StoredRestaurant): DishDraft[] {
-  return r.categories.flatMap((c) => c.dishes.map((d) => ({ key: d.id, id: d.id, category: c.name, name: d.name, price: centsToInput(d.price) })));
+  return r.categories.flatMap((c) => c.dishes.map((d) => ({
+    key: d.id, id: d.id, category: c.name, name: d.name, price: centsToInput(d.price),
+    ...(d.options ? { optionsOpen: true, optionLabel: d.options.label, optionValues: d.options.values.join(", ") } : {}),
+    ...(d.description ? { description: d.description } : {}),
+    ...(d.tags?.length ? { tags: d.tags } : {}),
+  })));
 }
 
 function toStored(id: string, data: Record<string, unknown>): StoredRestaurant {

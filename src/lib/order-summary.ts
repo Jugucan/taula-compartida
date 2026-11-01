@@ -51,6 +51,16 @@ export function summarize(orders: StoredOrder[], menu: MenuCategory[], extraCent
   };
 }
 
+/** «Poc fet ×2 · Al punt ×1»: quantes unitats hi ha de cada opció d'un plat. */
+export function optionCounts(line: DishLine): { option: string; qty: number }[] {
+  const counts = new Map<string, number>();
+  for (const g of line.guests) for (const o of g.options) counts.set(o, (counts.get(o) ?? 0) + 1);
+  return [...counts].map(([option, qty]) => ({ option, qty }));
+}
+
+/** «Maria (2), Pere» */
+export const guestNames = (line: DishLine) => line.guests.map((g) => (g.qty > 1 ? `${g.guest} (${g.qty})` : g.guest)).join(", ");
+
 // ---------- CSV (pensat per obrir-lo amb Excel en català: separador «;» i decimals amb coma) ----------
 
 const money = (cents: number) => (cents / 100).toFixed(2).replace(".", ",");
@@ -69,9 +79,9 @@ export function summaryCsv(summary: Summary, eventName: string): string {
     row(["Trobada", eventName]),
     row(["Comandes", summary.count]),
     "",
-    row(["Categoria", "Plat", "Quantitat", "Preu unitari (€)", "Subtotal (€)"]),
-    ...summary.lines.map((l) => row([l.category, l.name, l.qty, money(l.unitPriceCents), money(l.subtotalCents)])),
-    row(["", "", "", "Total", money(summary.totalCents)]),
+    row(["Categoria", "Plat", "Opcions", "Quantitat", "Preu unitari (€)", "Subtotal (€)"]),
+    ...summary.lines.map((l) => row([l.category, l.name, optionCounts(l).map((o) => `${o.option} ×${o.qty}`).join(" / "), l.qty, money(l.unitPriceCents), money(l.subtotalCents)])),
+    row(["", "", "", "", "Total", money(summary.totalCents)]),
   ]);
 }
 

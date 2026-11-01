@@ -194,7 +194,7 @@ function TrobadaView({ event, uid }: { event: StoredEvent; uid: string }) {
               <h3 className="font-sans text-sm font-bold uppercase tracking-widest text-muted-foreground">{c.name}</h3>
               <ul className="mt-2 divide-y">
                 {c.dishes.map((d) => (
-                  <li key={d.id} className="flex justify-between gap-4 py-2 text-lg"><span>{d.name}</span><span className="tabular shrink-0">{centsToInput(d.price)} €</span></li>
+                  <li key={d.id} className="flex justify-between gap-4 py-2 text-lg"><span>{d.name}{d.options && <span className="block text-base text-muted-foreground">{d.options.label}: {d.options.values.join(", ")}</span>}</span><span className="tabular shrink-0">{centsToInput(d.price)} €</span></li>
                 ))}
               </ul>
             </div>

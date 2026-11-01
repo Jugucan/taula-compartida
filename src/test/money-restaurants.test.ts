@@ -74,3 +74,29 @@ describe("modificar un restaurant", () => {
     expect(dishes.map((d) => [d.id, d.price])).toEqual([["abc", 1000], ["def", 400], ["nou-id", 200]]);
   });
 });
+
+describe("opcions dels plats", () => {
+  const withOptions = (label: string, values: string) => buildMenu([{ key: "a", category: "Segons", name: "Bistec", price: "15", optionLabel: label, optionValues: values }], () => "id");
+  it("converteix «Poc fet, Al punt» en una llista", () => {
+    const r = withOptions("Punt de cocció", "Poc fet, Al punt; Ben fet\nal punt");
+    const dish = r.ok ? r.categories[0]!.dishes[0]! : undefined;
+    expect(dish?.options).toEqual({ label: "Punt de cocció", values: ["Poc fet", "Al punt", "Ben fet"] });
+  });
+  it("posa un nom per defecte i no guarda res si no hi ha opcions", () => {
+    const r = withOptions("", "Tomàquet, Carbonara");
+    expect(r.ok && r.categories[0]!.dishes[0]!.options?.label).toBe("Opció");
+    const none = withOptions("Punt", "   ");
+    expect(none.ok && "options" in none.categories[0]!.dishes[0]!).toBe(false);
+  });
+  it("demana almenys dues opcions i en limita el nombre", () => {
+    expect(withOptions("Salsa", "Només una").ok).toBe(false);
+    expect(withOptions("Salsa", Array.from({ length: 13 }, (_, i) => `opció${i}`).join(",")).ok).toBe(false);
+  });
+  it("en modificar un restaurant, les opcions es mantenen", () => {
+    const stored: StoredRestaurant = { id: "r", name: "P", url: "", dishCount: 1, categories: [{ id: "segons", name: "Segons", dishes: [{ id: "x", name: "Bistec", price: 1500, options: { label: "Punt", values: ["Poc fet", "Ben fet"] } }] }] };
+    const drafts = draftsFromRestaurant(stored);
+    expect(drafts[0]).toMatchObject({ optionsOpen: true, optionLabel: "Punt", optionValues: "Poc fet, Ben fet" });
+    const r = buildMenu(drafts, () => "nou");
+    expect(r.ok && r.categories[0]!.dishes[0]).toMatchObject({ id: "x", options: { label: "Punt", values: ["Poc fet", "Ben fet"] } });
+  });
+});
