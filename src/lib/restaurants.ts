@@ -51,7 +51,7 @@ export function buildMenu(drafts: DishDraft[], makeId: () => string = () => cryp
     if (price === null || price <= 0) return { ok: false, error: `Revisa el preu de «${name}». Escriu-lo així: 12,50` };
     const opts = parseOptions(name, draft.optionLabel ?? "", draft.optionValues ?? "");
     if (!opts.ok) return opts;
-    const category = (CATEGORIES as readonly string[]).includes(draft.category) ? draft.category : "Altres";
+    const category = draft.category.replace(/\s+/g, " ").trim().slice(0, 40) || "Altres";
     const list = byCategory.get(category) ?? [];
     list.push({
       id: draft.id ?? makeId(), name, price,
@@ -62,7 +62,13 @@ export function buildMenu(drafts: DishDraft[], makeId: () => string = () => cryp
     byCategory.set(category, list);
   }
 
-  const categories = CATEGORIES.filter((c) => byCategory.has(c)).map((c) => ({ id: slug(c), name: c, dishes: byCategory.get(c)! }));
+  const used = new Set<string>();
+  const categories = [...byCategory].map(([name, dishes]) => {
+    let id = slug(name) || "categoria";
+    for (let n = 2; used.has(id); n++) id = `${slug(name) || "categoria"}-${n}`;
+    used.add(id);
+    return { id, name, dishes };
+  });
   return { ok: true, categories, dishCount: filled.length };
 }
 

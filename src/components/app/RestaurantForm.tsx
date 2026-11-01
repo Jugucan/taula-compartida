@@ -5,6 +5,9 @@ import { AlertTriangle, CheckCircle2, Plus, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useAdminUid } from "@/components/app/AdminGate";
 import { Action, actionVariants } from "@/components/app/primitives";
+import { getClientAuth } from "@/lib/firebase-client";
+import { importMenuFromUrl } from "@/lib/menu-import-api";
+import { parseMenuText, type ImportedDish } from "@/lib/menu-import";
 import { buildMenu, CATEGORIES, cleanUrl, deleteRestaurant, draftsFromRestaurant, saveRestaurant, updateRestaurant, type DishDraft, type StoredRestaurant } from "@/lib/restaurants";
 
 const inputCls = "min-h-12 w-full rounded-lg border-2 border-input bg-background px-3 text-lg outline-none focus:border-primary";
@@ -23,12 +26,56 @@ export function RestaurantForm({ existing }: { existing?: StoredRestaurant }) {
   const [error, setError] = useState("");
   const [savedCount, setSavedCount] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [importMode, setImportMode] = useState<null | "url" | "text">(null);
+  const [importUrl, setImportUrl] = useState("");
+  const [importText, setImportText] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const update = (key: string, patch: Partial<DishDraft>) => setRows((r) => r.map((x) => (x.key === key ? { ...x, ...patch } : x)));
   const refresh = () => Promise.all([
     queryClient.invalidateQueries({ queryKey: ["restaurants", uid] }),
     queryClient.invalidateQueries({ queryKey: ["restaurant", uid, restaurantId.current] }),
   ]);
+
+  function addImported(dishes: ImportedDish[], withoutPrice: number) {
+    const fresh: DishDraft[] = dishes.map((d) => ({
+      key: crypto.randomUUID(), category: d.category, name: d.name, price: d.price,
+      ...(d.description ? { description: d.description } : {}),
+      ...(d.optionValues ? { optionsOpen: true, optionLabel: d.optionLabel, optionValues: d.optionValues } : {}),
+    }));
+    setRows((r) => [...r.filter((x) => x.name.trim() || x.price.trim()), ...fresh]);
+    const categories = new Set(dishes.map((d) => d.category)).size;
+    setImportMsg({ tone: "ok", text: `He trobat ${dishes.length} plats en ${categories} ${categories === 1 ? "categoria" : "categories"}. Revisa'ls més avall${withoutPrice ? `: n'hi ha ${withoutPrice} sense preu (en vermell) i els has d'omplir tu` : ""}.` });
+    setImportMode(null);
+  }
+
+  async function readUrl() {
+    setImportMsg(null);
+    if (!importUrl.trim()) return setImportMsg({ tone: "error", text: "Enganxa primer l'enllaç de la carta." });
+    setImporting(true);
+    try {
+      const idToken = await getClientAuth().currentUser?.getIdToken();
+      const result = await importMenuFromUrl({ data: { url: importUrl.trim(), idToken: idToken ?? "" } });
+      if (!result.ok) return setImportMsg({ tone: "error", text: result.error });
+      if (!name.trim() && result.title) setName(result.title.slice(0, 80));
+      if (!url.trim() && cleanUrl(importUrl).ok) setUrl(importUrl.trim());
+      addImported(result.dishes, result.withoutPrice);
+    } catch {
+      setImportMsg({ tone: "error", text: "No he pogut llegir la carta ara mateix. Comprova la connexió o enganxa'n el text." });
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  function readText() {
+    setImportMsg(null);
+    const result = parseMenuText(importText);
+    if (result.dishes.length === 0) return setImportMsg({ tone: "error", text: "No he trobat cap plat amb preu en aquest text. Comprova que hi surten els preus, o afegeix els plats a mà." });
+    addImported(result.dishes, result.withoutPrice);
+    setImportText("");
+  }
 
   async function save() {
     setError("");
@@ -99,16 +146,38 @@ export function RestaurantForm({ existing }: { existing?: StoredRestaurant }) {
 
       <section className="rounded-3xl border bg-card p-6">
         <h2 className="text-xl font-semibold">2. Els plats</h2>
+        <div className="mt-4 rounded-2xl bg-secondary p-5">
+          <p className="text-lg font-bold">Més ràpid: llegeix la carta automàticament</p>
+          <p className="mt-1 text-muted-foreground">No cal escriure els plats un per un.</p>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <Action variant={importMode === "url" ? "ink" : "outline"} size="md" onClick={() => { setImportMode(importMode === "url" ? null : "url"); setImportMsg(null); }}>Des d'un enllaç de la web</Action>
+            <Action variant={importMode === "text" ? "ink" : "outline"} size="md" onClick={() => { setImportMode(importMode === "text" ? null : "text"); setImportMsg(null); }}>Enganxar el text de la carta</Action>
+          </div>
+          {importMode === "url" && (
+            <div className="mt-4">
+              <label htmlFor="import-url" className="block text-lg font-bold">Enllaç de la carta</label>
+              <input id="import-url" inputMode="url" placeholder="https://" value={importUrl} onChange={(e) => setImportUrl(e.target.value)} className={bigInputCls} />
+              <Action className="mt-3" onClick={readUrl} disabled={importing}>{importing ? "Llegint la carta…" : "Llegir la carta"}</Action>
+            </div>
+          )}
+          {importMode === "text" && (
+            <div className="mt-4">
+              <label htmlFor="import-text" className="block text-lg font-bold">Enganxa aquí el text de la carta</label>
+              <p className="text-muted-foreground">Pots copiar-lo d'una web, d'un PDF o d'un correu. Funciona millor si cada plat porta el seu preu i les categories (ENTRANTS, SEGONS…) van en majúscules.</p>
+              <textarea id="import-text" rows={8} value={importText} onChange={(e) => setImportText(e.target.value)} className="mt-2 w-full rounded-xl border-2 border-input bg-background p-4 text-base outline-none focus:border-primary" />
+              <Action className="mt-3" onClick={readText}>Llegir el text</Action>
+            </div>
+          )}
+          {importMsg && <p role={importMsg.tone === "error" ? "alert" : "status"} className={`mt-4 rounded-xl p-4 font-semibold ${importMsg.tone === "error" ? "bg-destructive-soft text-destructive" : "bg-success-soft text-success"}`}>{importMsg.text}</p>}
+        </div>
         {existing && <p className="mt-2 text-muted-foreground">Les trobades que ja has creat no canvien: conserven la seva còpia de la carta. Per aplicar-hi els canvis, fes servir «Actualitzar la carta» a «Modificar la trobada».</p>}
         <ul className="mt-4 space-y-3">
           {rows.map((d, i) => (
             <li key={d.key} className="grid gap-3 rounded-2xl border-2 border-border bg-card p-4 sm:grid-cols-[9rem_1fr_8rem_auto] sm:items-end">
-              <select aria-label={`Categoria del plat ${i + 1}`} value={d.category} onChange={(e) => update(d.key, { category: e.target.value })} className={inputCls}>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <input aria-label={`Categoria del plat ${i + 1}`} list="categories-list" placeholder="Categoria" value={d.category} maxLength={40} onChange={(e) => update(d.key, { category: e.target.value })} className={inputCls} />
               <input aria-label={`Nom del plat ${i + 1}`} placeholder="Nom del plat" value={d.name} maxLength={80} onChange={(e) => update(d.key, { name: e.target.value })} className={inputCls} />
               <div className="relative">
-                <input aria-label={`Preu del plat ${i + 1}`} inputMode="decimal" placeholder="0,00" value={d.price} onChange={(e) => update(d.key, { price: e.target.value })} className={inputCls + " tabular pr-8"} />
+                <input aria-label={`Preu del plat ${i + 1}`} inputMode="decimal" placeholder="0,00" value={d.price} onChange={(e) => update(d.key, { price: e.target.value })} className={inputCls + " tabular pr-8" + (d.name.trim() && !d.price.trim() ? " border-destructive" : "")} />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
               </div>
               <button type="button" onClick={() => setRows((r) => (r.length > 1 ? r.filter((x) => x.key !== d.key) : r))} className="inline-flex min-h-12 items-center gap-2 rounded-full px-3 font-semibold text-destructive hover:bg-destructive-soft">
@@ -138,9 +207,19 @@ export function RestaurantForm({ existing }: { existing?: StoredRestaurant }) {
             </li>
           ))}
         </ul>
+        <datalist id="categories-list">{[...new Set([...CATEGORIES, ...rows.map((r) => r.category.trim()).filter(Boolean)])].map((c) => <option key={c} value={c} />)}</datalist>
         <button type="button" onClick={() => setRows((r) => [...r, newRow()])} className={actionVariants({ variant: "outline", size: "md", className: "mt-4" })}>
           <Plus className="size-5" aria-hidden /> Afegir un plat
         </button>
+        {rows.length > 3 && (confirmClear ? (
+          <span className="mt-4 ml-4 inline-flex items-center gap-3">
+            <span className="font-semibold">Segur?</span>
+            <button type="button" onClick={() => { setRows([newRow()]); setConfirmClear(false); }} className="font-semibold text-destructive underline">Sí, esborrar-los tots</button>
+            <button type="button" onClick={() => setConfirmClear(false)} className="font-semibold underline">No</button>
+          </span>
+        ) : (
+          <button type="button" onClick={() => setConfirmClear(true)} className="mt-4 ml-4 font-semibold text-destructive underline">Esborrar tots els plats</button>
+        ))}
       </section>
 
       {error && (

@@ -39,9 +39,13 @@ describe("buildMenu", () => {
     expect(buildMenu([draft("Pa", "0")], id).ok).toBe(false);
     expect(buildMenu([draft("Pa", "uns 5")], id).ok).toBe(false);
   });
-  it("una categoria desconeguda passa a «Altres»", () => {
-    const r = buildMenu([draft("Pa", "1", "Inventada")], id);
-    expect(r.ok && r.categories[0]!.name).toBe("Altres");
+  it("les categories són lliures, en l'ordre en què apareixen, i una de buida passa a «Altres»", () => {
+    const r = buildMenu([draft("Pa", "1", "Per picar"), draft("Vi", "5", "  "), draft("Brou", "2", "Per picar")], id);
+    expect(r.ok && r.categories.map((c) => [c.name, c.dishes.length])).toEqual([["Per picar", 2], ["Altres", 1]]);
+  });
+  it("dues categories que donarien el mateix identificador no es barregen", () => {
+    const r = buildMenu([draft("A", "1", "Postres!"), draft("B", "1", "Postres?")], id);
+    expect(r.ok && new Set(r.categories.map((c) => c.id)).size).toBe(2);
   });
 });
 
