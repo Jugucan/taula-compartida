@@ -15,6 +15,7 @@ import { Route as AdminCartaRouteImport } from './routes/admin.carta'
 import { Route as AdminComandesRouteImport } from './routes/admin.comandes'
 import { Route as AdminNovaRouteImport } from './routes/admin.nova'
 import { Route as AdminResumRouteImport } from './routes/admin.resum'
+import { Route as ApiSalutRouteImport } from './routes/api.salut'
 import { Route as TCodeRouteImport } from './routes/t.$code'
 import { Route as AdminCopiarTrobadaIdRouteImport } from './routes/admin.copiar-trobada.$id'
 import { Route as AdminEditarTrobadaIdRouteImport } from './routes/admin.editar-trobada.$id'
@@ -53,6 +54,11 @@ const AdminNovaRoute = AdminNovaRouteImport.update({
 const AdminResumRoute = AdminResumRouteImport.update({
   id: '/admin/resum',
   path: '/admin/resum',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSalutRoute = ApiSalutRouteImport.update({
+  id: '/api/salut',
+  path: '/api/salut',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TCodeRoute = TCodeRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
+  '/api/salut': typeof ApiSalutRoute
   '/t/$code': typeof TCodeRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/admin/copiar-trobada/$id': typeof AdminCopiarTrobadaIdRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
+  '/api/salut': typeof ApiSalutRoute
   '/admin': typeof AdminIndexRoute
   '/admin/copiar-trobada/$id': typeof AdminCopiarTrobadaIdRoute
   '/admin/editar-trobada/$id': typeof AdminEditarTrobadaIdRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
   '/admin/resum': typeof AdminResumRoute
+  '/api/salut': typeof ApiSalutRoute
   '/t/$code': typeof TCodeRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/admin/copiar-trobada/$id': typeof AdminCopiarTrobadaIdRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/admin/comandes'
     | '/admin/nova'
     | '/admin/resum'
+    | '/api/salut'
     | '/t/$code'
     | '/admin/'
     | '/admin/copiar-trobada/$id'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/admin/comandes'
     | '/admin/nova'
     | '/admin/resum'
+    | '/api/salut'
     | '/admin'
     | '/admin/copiar-trobada/$id'
     | '/admin/editar-trobada/$id'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/admin/comandes'
     | '/admin/nova'
     | '/admin/resum'
+    | '/api/salut'
     | '/t/$code'
     | '/admin/'
     | '/admin/copiar-trobada/$id'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   AdminComandesRoute: typeof AdminComandesRoute
   AdminNovaRoute: typeof AdminNovaRoute
   AdminResumRoute: typeof AdminResumRoute
+  ApiSalutRoute: typeof ApiSalutRoute
   TCodeRoute: typeof TCodeRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCopiarTrobadaIdRoute: typeof AdminCopiarTrobadaIdRoute
@@ -261,6 +274,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/resum'
       fullPath: '/admin/resum'
       preLoaderRoute: typeof AdminResumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/salut': {
+      id: '/api/salut'
+      path: '/api/salut'
+      fullPath: '/api/salut'
+      preLoaderRoute: typeof ApiSalutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/t/$code': {
@@ -351,6 +371,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminComandesRoute: AdminComandesRoute,
   AdminNovaRoute: AdminNovaRoute,
   AdminResumRoute: AdminResumRoute,
+  ApiSalutRoute: ApiSalutRoute,
   TCodeRoute: TCodeRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   AdminCopiarTrobadaIdRoute: AdminCopiarTrobadaIdRoute,

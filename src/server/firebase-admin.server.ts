@@ -1,7 +1,6 @@
 // Connexió del SERVIDOR amb Firebase (Admin SDK). Mai s'importa des del navegador.
 // Les credencials venen de variables d'entorn de Netlify; no s'escriuen mai al codi.
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
 function getAdminApp(): App {
@@ -27,6 +26,7 @@ export function getDb() {
 export async function verifyAdminToken(idToken: unknown): Promise<string | null> {
   if (typeof idToken !== "string" || idToken.length < 100 || idToken.length > 4000) return null;
   try {
+    const { getAuth } = await import("firebase-admin/auth");
     const decoded = await getAuth(getAdminApp()).verifyIdToken(idToken);
     return decoded.uid;
   } catch {
