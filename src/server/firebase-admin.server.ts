@@ -21,15 +21,3 @@ function getAdminApp(): App {
 export function getDb() {
   return getFirestore(getAdminApp());
 }
-
-/** Comprova el «passi» d'inici de sessió que envia el navegador i retorna l'identificador de la persona. */
-export async function verifyAdminToken(idToken: unknown): Promise<string | null> {
-  if (typeof idToken !== "string" || idToken.length < 100 || idToken.length > 4000) return null;
-  try {
-    const { getAuth } = await import("firebase-admin/auth");
-    const decoded = await getAuth(getAdminApp()).verifyIdToken(idToken);
-    return decoded.uid;
-  } catch {
-    return null;
-  }
-}
