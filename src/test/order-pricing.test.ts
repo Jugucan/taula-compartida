@@ -28,11 +28,19 @@ describe("priceOrder", () => {
     expect(priceOrder(demoMenu, [{ dishId: "pa", qty: 1 }, { dishId: "pa", qty: 1 }]).ok).toBe(false);
   });
 
-  it("exigeix una opció per unitat quan el plat en té", () => {
+  it("les opcions antigues són opcionals i, si arriben, es comproven", () => {
     const first = withOptions.options!.values[0]!;
-    expect(priceOrder(demoMenu, [{ dishId: withOptions.id, qty: 2 }]).ok).toBe(false);
+    expect(priceOrder(demoMenu, [{ dishId: withOptions.id, qty: 2 }]).ok).toBe(true);
     expect(priceOrder(demoMenu, [{ dishId: withOptions.id, qty: 2, options: [first] }]).ok).toBe(false);
     expect(priceOrder(demoMenu, [{ dishId: withOptions.id, qty: 2, options: [first, "inventada"] }]).ok).toBe(false);
     expect(priceOrder(demoMenu, [{ dishId: withOptions.id, qty: 2, options: [first, first] }]).ok).toBe(true);
+    expect(priceOrder(demoMenu, [{ dishId: "pa", qty: 1, options: ["res"] }]).ok).toBe(false);
+  });
+  it("guarda la nota lliure de cada plat, neta d'espais, i en limita la mida", () => {
+    const r = priceOrder(demoMenu, [{ dishId: "pa", qty: 2, note: "  poc fet   i amb  patates " }]);
+    expect(r.ok && r.items[0]!.note).toBe("poc fet i amb patates");
+    expect(priceOrder(demoMenu, [{ dishId: "pa", qty: 1 }]).ok && true).toBe(true);
+    expect(priceOrder(demoMenu, [{ dishId: "pa", qty: 1, note: "x".repeat(121) }]).ok).toBe(false);
+    expect(priceOrder(demoMenu, [{ dishId: "pa", qty: 1, note: 5 }]).ok).toBe(false);
   });
 });

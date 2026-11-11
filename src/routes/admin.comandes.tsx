@@ -106,7 +106,7 @@ function Orders({ uid, event }: { uid: string; event: StoredEvent }) {
               <li key={line.key} className="rounded-lg border bg-card p-5">
                 <h3 className="flex items-start justify-between gap-3 font-sans text-xl font-semibold"><span>{line.name}</span><span className="tabular shrink-0 text-primary">{line.qty}×</span></h3>
                 <ul className="mt-3 divide-y">{line.guests.map((g, i) => (
-                  <li key={i} className="py-3"><p className="text-lg font-bold">{g.guest} <span className="tabular font-normal text-muted-foreground">· {g.qty}×</span></p>{g.options.length > 0 && <p className="text-primary">{g.options.join(" · ")}</p>}{g.note && <p className="mt-1 font-semibold text-warning">{g.note}</p>}</li>
+                  <li key={i} className="py-3"><p className="text-lg font-bold">{g.guest} <span className="tabular font-normal text-muted-foreground">· {g.qty}×</span></p>{g.options.length > 0 && <p className="text-primary">{g.options.join(" · ")}</p>}{g.itemNote && <p className="text-primary">{g.itemNote}</p>}{g.note && <p className="mt-1 font-semibold text-warning">{g.note}</p>}</li>
                 ))}</ul>
               </li>
             ))}</ul>
@@ -128,7 +128,7 @@ function Orders({ uid, event }: { uid: string; event: StoredEvent }) {
                   </Action>
                   {open === o.id && (
                     <div className="rise px-5 pb-5 pl-19">
-                      <ul className="space-y-1 text-lg">{o.items.map((i) => <li key={i.dishId}><span className="tabular font-bold">{i.qty}×</span> {i.name}{i.options?.length ? <span className="block text-base text-primary">{i.options.join(" · ")}</span> : null}</li>)}</ul>
+                      <ul className="space-y-1 text-lg">{o.items.map((i) => <li key={i.dishId}><span className="tabular font-bold">{i.qty}×</span> {i.name}{i.options?.length ? <span className="block text-base text-primary">{i.options.join(" · ")}</span> : null}{i.note ? <span className="block text-base text-primary">{i.note}</span> : null}</li>)}</ul>
                       {o.note && <p className="mt-3 rounded-xl bg-warning-soft p-3 font-semibold text-warning">Nota: {o.note}</p>}
                     </div>
                   )}

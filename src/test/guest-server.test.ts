@@ -101,7 +101,21 @@ describe("saveOrder", () => {
   });
   it("rebutja enllaços desconeguts", async () => {
     const { saveOrder } = await import("@/server/guest.server");
-    expect((await saveOrder({ code: "zzzzzzzzzzzzzzzz", orderId: ID1, token: T1, guestName: "Maria", note: "", items: [{ dishId: "pa", qty: 1, options: [] }] })).ok).toBe(false);
+    expect((await saveOrder({ code: "zzzzzzzzzzzzzzzz", orderId: ID1, token: T1, guestName: "Maria", note: "", items: [{ dishId: "pa", qty: 1, options: [], note: "" }] })).ok).toBe(false);
+  });
+});
+
+describe("nota lliure per plat", () => {
+  it("es desa amb la comanda i el convidat la recupera amb el seu codi", async () => {
+    const { saveOrder, fetchMyOrder } = await import("@/server/guest.server");
+    expect(await saveOrder(order(ID1, T1, [{ dishId: "pa", qty: 1, note: "  amb   poca sal " }]))).toEqual({ ok: true });
+    expect((db.store.get(`${EVENT}/orders/${ID1}`) as { items: { note: string }[] }).items[0]!.note).toBe("amb poca sal");
+    expect((await fetchMyOrder(CODE, ID1, T1))!.items[0]).toMatchObject({ dishId: "pa", note: "amb poca sal" });
+  });
+  it("una nota massa llarga es rebutja i no es desa res", async () => {
+    const { saveOrder } = await import("@/server/guest.server");
+    expect((await saveOrder(order(ID1, T1, [{ dishId: "pa", qty: 1, note: "x".repeat(200) }]))).ok).toBe(false);
+    expect([...db.store.keys()].some((k) => k.includes("/orders/"))).toBe(false);
   });
 });
 
@@ -109,7 +123,7 @@ describe("fetchMyOrder", () => {
   it("només retorna la comanda amb el codi personal correcte", async () => {
     const { saveOrder, fetchMyOrder } = await import("@/server/guest.server");
     await saveOrder(order(ID1, T1, [{ dishId: "pa", qty: 2 }], "Maria"));
-    expect(await fetchMyOrder(CODE, ID1, T1)).toEqual({ guestName: "Maria", note: "", items: [{ dishId: "pa", qty: 2, options: [] }] });
+    expect(await fetchMyOrder(CODE, ID1, T1)).toEqual({ guestName: "Maria", note: "", items: [{ dishId: "pa", qty: 2, options: [], note: "" }] });
     expect(await fetchMyOrder(CODE, ID1, T2)).toBeNull();
     expect(await fetchMyOrder(CODE, ID2, T1)).toBeNull();
     expect(await fetchMyOrder("zzzzzzzzzzzzzzzz", ID1, T1)).toBeNull();

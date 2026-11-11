@@ -13,7 +13,7 @@ export type PublicEvent = {
   stats: { count: number; totalCents: number }; // per a l'import compartit estimat
 };
 
-export type MyOrder = { guestName: string; note: string; items: { dishId: string; qty: number; options: string[] }[] };
+export type MyOrder = { guestName: string; note: string; items: { dishId: string; qty: number; options: string[]; note: string }[] };
 
-export type SendOrderInput = { code: string; orderId: string; token: string; guestName: string; note: string; items: { dishId: string; qty: number; options: string[] }[] };
+export type SendOrderInput = { code: string; orderId: string; token: string; guestName: string; note: string; items: { dishId: string; qty: number; options: string[]; note: string }[] };
 export type SendOrderResult = { ok: true } | { ok: false; error: string };

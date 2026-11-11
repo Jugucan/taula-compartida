@@ -6,7 +6,7 @@ import { getMyOrder, getPublicEvent, sendOrder } from "@/lib/guest-api";
 import type { PublicEvent } from "@/lib/guest-types";
 import { emptySession, loadSession, parsePersonalHash, personalLink, randomToken, saveSession, type GuestSession } from "@/lib/guest-session";
 
-export type Line = { dish: Dish; qty: number; options: string[] };
+export type Line = { dish: Dish; qty: number; options: string[]; note: string };
 type EventState = "loading" | "error" | "notfound" | "ready";
 
 type GuestState = {
@@ -17,14 +17,14 @@ type GuestState = {
   lines: Line[];
   count: number;
   quantities: Record<string, number>;
-  selections: Record<string, string[]>;
+  dishNotes: Record<string, string>;
   guestName: string;
   note: string;
   submitted: boolean;
   cost: { count: number; perPerson: number };
   extraCents: number;
   setQty: (dishId: string, qty: number) => void;
-  setOption: (dishId: string, index: number, option: string) => void;
+  setDishNote: (dishId: string, note: string) => void;
   setGuestName: (v: string) => void;
   setNote: (v: string) => void;
   send: () => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -87,7 +87,7 @@ export function GuestProvider({ code, children }: { code: string; children: Reac
       if (!mine) return;
       update({
         quantities: Object.fromEntries(mine.items.map((i) => [i.dishId, i.qty])),
-        selections: Object.fromEntries(mine.items.map((i) => [i.dishId, i.options])),
+        dishNotes: Object.fromEntries(mine.items.map((i) => [i.dishId, i.note])),
         guestName: mine.guestName,
         note: mine.note,
         submitted: true,
@@ -101,8 +101,7 @@ export function GuestProvider({ code, children }: { code: string; children: Reac
     const lines: Line[] = Object.entries(session.quantities).flatMap(([id, qty]) => {
       const dish = dishes.get(id);
       if (!dish || qty < 1) return [];
-      const options = dish.options ? Array.from({ length: qty }, (_, i) => session.selections[id]?.[i] ?? dish.options?.values[0] ?? "") : [];
-      return [{ dish, qty, options }];
+      return [{ dish, qty, options: [], note: session.dishNotes[id] ?? "" }];
     });
     const stats = event?.stats ?? { count: 0, totalCents: 0 };
     const extraCents = event?.extraCents ?? 0;
@@ -110,16 +109,12 @@ export function GuestProvider({ code, children }: { code: string; children: Reac
     return {
       code, hydrated, eventState, event, lines,
       count: lines.reduce((sum, l) => sum + l.qty, 0),
-      quantities: session.quantities, selections: session.selections,
+      quantities: session.quantities, dishNotes: session.dishNotes,
       guestName: session.guestName, note: session.note, submitted: session.submitted,
       cost: { count: stats.count, perPerson: stats.count ? Math.round(stats.totalCents / stats.count) + extraCents : 0 },
       extraCents,
       setQty: (id, qty) => update({ quantities: { ...sessionRef.current.quantities, [id]: Math.max(0, Math.min(20, qty)) } }),
-      setOption: (id, index, option) => {
-        const values = [...(sessionRef.current.selections[id] ?? [])];
-        values[index] = option;
-        update({ selections: { ...sessionRef.current.selections, [id]: values } });
-      },
+      setDishNote: (id, note) => update({ dishNotes: { ...sessionRef.current.dishNotes, [id]: note.slice(0, 120) } }),
       setGuestName: (v) => update({ guestName: v }),
       setNote: (v) => update({ note: v }),
       send: async () => {
@@ -127,7 +122,7 @@ export function GuestProvider({ code, children }: { code: string; children: Reac
         if (!sessionRef.current.orderId || !sessionRef.current.token) update({ orderId: crypto.randomUUID(), token: randomToken() });
         const s = sessionRef.current;
         try {
-          const result = await sendOrder({ data: { code, orderId: s.orderId, token: s.token, guestName: s.guestName, note: s.note, items: lines.map((l) => ({ dishId: l.dish.id, qty: l.qty, options: l.options })) } });
+          const result = await sendOrder({ data: { code, orderId: s.orderId, token: s.token, guestName: s.guestName, note: s.note, items: lines.map((l) => ({ dishId: l.dish.id, qty: l.qty, options: l.options, note: l.note })) } });
           if (!result.ok) return result;
           update({ submitted: true });
           await queryClient.invalidateQueries({ queryKey: ["public-event", code] });

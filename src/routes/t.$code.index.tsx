@@ -4,7 +4,6 @@ import { useState } from "react";
 import { GuestLayout } from "@/components/app/GuestLayout";
 import { actionVariants, QuantityStepper, StateMessage, Action } from "@/components/app/primitives";
 import { SharedEstimate } from "@/components/app/SharedEstimate";
-import { DishOptions } from "@/components/app/DishOptions";
 import { RecoverOrder } from "@/components/app/RecoverOrder";
 import { formatDeadline, formatEventDate } from "@/lib/events";
 import { formatEuro, plural } from "@/lib/format";
@@ -125,7 +124,6 @@ function CartaPage() {
                       <div>
                         <h3 className="font-sans text-lg font-bold leading-snug">{d.name}</h3>
                         {d.description && <p className="mt-1 text-muted-foreground">{d.description}</p>}
-                        {d.options && <p className="mt-2 text-sm font-semibold text-primary">Pots triar: {d.options.label.toLowerCase()}</p>}
                         {d.tags?.map((t) => <span key={t} className="mt-2 mr-2 inline-block rounded-full bg-accent px-2.5 py-0.5 text-sm font-semibold text-accent-foreground">{t}</span>)}
                       </div>
                       <span className="tabular shrink-0 text-lg font-bold">{formatEuro(d.price)}</span>
@@ -133,7 +131,6 @@ function CartaPage() {
                     <div className="mt-4 flex justify-end">
                       <QuantityStepper value={q} onChange={(v) => setQty(d.id, v)} label={d.name} />
                     </div>
-                    <DishOptions dish={d} qty={q} />
                   </li>
                 );
               })}

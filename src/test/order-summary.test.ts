@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { demoMenu } from "@/data/demo";
-import { guestNames, guestsCsv, optionCounts, summarize, summaryCsv } from "@/lib/order-summary";
+import { guestNames, guestsCsv, itemNotes, optionCounts, summarize, summaryCsv } from "@/lib/order-summary";
 import type { StoredOrder } from "@/lib/orders";
 
-const item = (dishId: string, name: string, unit: number, qty: number, options: string[] = []) => ({ dishId, name, unitPriceCents: unit, qty, options, subtotalCents: unit * qty });
+const item = (dishId: string, name: string, unit: number, qty: number, options: string[] = [], note = "") => ({ dishId, name, unitPriceCents: unit, qty, options, note, subtotalCents: unit * qty });
 const order = (id: string, guestName: string, items: ReturnType<typeof item>[], note = ""): StoredOrder => ({ id, guestName, note, items, totalCents: 0, createdAt: null });
 
 const orders = [
@@ -79,5 +79,21 @@ describe("opcions i noms per plat", () => {
   });
   it("el CSV del resum porta les opcions", () => {
     expect(summaryCsv(summarize(carns, demoMenu, 0), "Sopar")).toContain("Bistec;Poc fet ×2 / Al punt ×1;3;15,00;45,00");
+  });
+});
+
+describe("notes lliures per plat", () => {
+  const ords = [
+    order("1", "Maria", [item("bistec", "Bistec", 1500, 1, [], "poc fet, amb patates")]),
+    order("2", "Pere", [item("bistec", "Bistec", 1500, 2, [], "un al punt i un ben fet")]),
+    order("3", "Anna", [item("bistec", "Bistec", 1500, 1)]),
+  ];
+  it("recull les notes de cada plat amb qui les ha escrit", () => {
+    const line = summarize(ords, demoMenu, 0).lines[0]!;
+    expect(itemNotes(line)).toEqual([{ guest: "Maria", note: "poc fet, amb patates" }, { guest: "Pere", note: "un al punt i un ben fet" }]);
+  });
+  it("les notes surten al CSV del resum i al per persona", () => {
+    expect(summaryCsv(summarize(ords, demoMenu, 0), "Sopar")).toContain("Bistec;poc fet, amb patates / un al punt i un ben fet;4;15,00;60,00");
+    expect(guestsCsv(ords)).toContain("Maria;Bistec;1;poc fet, amb patates;15,00;15,00");
   });
 });

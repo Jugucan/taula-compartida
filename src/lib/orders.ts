@@ -16,7 +16,7 @@ export async function listOrders(uid: string, eventId: string): Promise<StoredOr
       id: d.id,
       guestName: String(data["guestName"] ?? ""),
       note: String(data["note"] ?? ""),
-      items: (data["items"] ?? []) as PricedItem[],
+      items: ((data["items"] ?? []) as Partial<PricedItem>[]).map((i) => ({ ...i, options: i.options ?? [], note: i.note ?? "" }) as PricedItem),
       totalCents: Number(data["totalCents"] ?? 0),
       createdAt: created?.toDate ? created.toDate() : null,
     };

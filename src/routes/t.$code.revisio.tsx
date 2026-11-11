@@ -3,7 +3,7 @@ import { Trash2 } from "lucide-react";
 import { GuestLayout } from "@/components/app/GuestLayout";
 import { Action, actionVariants, QuantityStepper, StateMessage } from "@/components/app/primitives";
 import { SharedEstimate } from "@/components/app/SharedEstimate";
-import { DishOptions } from "@/components/app/DishOptions";
+import { DishNote } from "@/components/app/DishNote";
 import { formatEuro } from "@/lib/format";
 import { useGuest } from "@/lib/guest-order";
 
@@ -42,7 +42,7 @@ function RevisioPage() {
                   </Action>
                   <QuantityStepper value={qty} onChange={(v) => setQty(dish.id, v)} label={dish.name} />
                 </div>
-                <DishOptions dish={dish} qty={qty} />
+                <DishNote dish={dish} qty={qty} />
               </li>
             ))}
           </ul>

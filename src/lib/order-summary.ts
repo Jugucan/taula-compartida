@@ -2,7 +2,7 @@
 import type { MenuCategory } from "@/data/demo";
 import type { StoredOrder } from "@/lib/orders";
 
-export type DishGuest = { guest: string; qty: number; options: string[]; note: string };
+export type DishGuest = { guest: string; qty: number; options: string[]; note: string; itemNote: string }; // note: la de tota la comanda; itemNote: la d'aquest plat
 export type DishLine = { key: string; dishId: string; name: string; category: string; unitPriceCents: number; qty: number; subtotalCents: number; guests: DishGuest[] };
 export type Summary = {
   count: number;
@@ -28,7 +28,7 @@ export function summarize(orders: StoredOrder[], menu: MenuCategory[], extraCent
       const line = lines.get(key) ?? { key, dishId: item.dishId, name: item.name, category: categoryOf.get(item.dishId) ?? "Altres", unitPriceCents: item.unitPriceCents, qty: 0, subtotalCents: 0, guests: [] };
       line.qty += item.qty;
       line.subtotalCents += subtotal;
-      line.guests.push({ guest: order.guestName, qty: item.qty, options: item.options ?? [], note: order.note });
+      line.guests.push({ guest: order.guestName, qty: item.qty, options: item.options ?? [], note: order.note, itemNote: item.note ?? "" });
       lines.set(key, line);
     }
   }
@@ -58,6 +58,9 @@ export function optionCounts(line: DishLine): { option: string; qty: number }[] 
   return [...counts].map(([option, qty]) => ({ option, qty }));
 }
 
+/** Les notes que els convidats han escrit per a aquest plat. */
+export const itemNotes = (line: DishLine) => line.guests.filter((g) => g.itemNote).map((g) => ({ guest: g.guest, note: g.itemNote }));
+
 /** «Maria (2), Pere» */
 export const guestNames = (line: DishLine) => line.guests.map((g) => (g.qty > 1 ? `${g.guest} (${g.qty})` : g.guest)).join(", ");
 
@@ -79,16 +82,16 @@ export function summaryCsv(summary: Summary, eventName: string): string {
     row(["Trobada", eventName]),
     row(["Comandes", summary.count]),
     "",
-    row(["Categoria", "Plat", "Opcions", "Quantitat", "Preu unitari (€)", "Subtotal (€)"]),
-    ...summary.lines.map((l) => row([l.category, l.name, optionCounts(l).map((o) => `${o.option} ×${o.qty}`).join(" / "), l.qty, money(l.unitPriceCents), money(l.subtotalCents)])),
+    row(["Categoria", "Plat", "Opcions i notes", "Quantitat", "Preu unitari (€)", "Subtotal (€)"]),
+    ...summary.lines.map((l) => row([l.category, l.name, [...optionCounts(l).map((o) => `${o.option} ×${o.qty}`), ...itemNotes(l).map((n) => n.note)].join(" / "), l.qty, money(l.unitPriceCents), money(l.subtotalCents)])),
     row(["", "", "", "", "Total", money(summary.totalCents)]),
   ]);
 }
 
 export function guestsCsv(orders: StoredOrder[]): string {
-  const rows: string[] = [row(["Convidat", "Plat", "Quantitat", "Opcions", "Preu unitari (€)", "Subtotal (€)", "Nota", "Total de la comanda (€)"])];
+  const rows: string[] = [row(["Convidat", "Plat", "Quantitat", "Opcions i nota del plat", "Preu unitari (€)", "Subtotal (€)", "Nota general", "Total de la comanda (€)"])];
   for (const o of orders) {
-    o.items.forEach((i, index) => rows.push(row([o.guestName, i.name, i.qty, (i.options ?? []).join(" / "), money(i.unitPriceCents), money(i.unitPriceCents * i.qty), index === 0 ? o.note : "", index === 0 ? money(o.items.reduce((s, x) => s + x.unitPriceCents * x.qty, 0)) : ""])));
+    o.items.forEach((i, index) => rows.push(row([o.guestName, i.name, i.qty, [...(i.options ?? []), ...(i.note ? [i.note] : [])].join(" / "), money(i.unitPriceCents), money(i.unitPriceCents * i.qty), index === 0 ? o.note : "", index === 0 ? money(o.items.reduce((s, x) => s + x.unitPriceCents * x.qty, 0)) : ""])));
   }
   return finish(rows);
 }

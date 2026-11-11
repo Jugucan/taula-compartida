@@ -52,7 +52,7 @@ export async function fetchMyOrder(code: unknown, orderId: unknown, token: unkno
   const snap = await getDb().doc(`${eventPath(ref)}/orders/${orderId}`).get();
   const d = snap.data();
   if (!snap.exists || !d || typeof d["tokenHash"] !== "string" || !sameHash(d["tokenHash"], hash(token))) return null;
-  const items = ((d["items"] ?? []) as { dishId: string; qty: number; options?: string[] }[]).map((i) => ({ dishId: i.dishId, qty: i.qty, options: i.options ?? [] }));
+  const items = ((d["items"] ?? []) as { dishId: string; qty: number; options?: string[]; note?: string }[]).map((i) => ({ dishId: i.dishId, qty: i.qty, options: i.options ?? [], note: i.note ?? "" }));
   return { guestName: String(d["guestName"] ?? ""), note: String(d["note"] ?? ""), items };
 }
 

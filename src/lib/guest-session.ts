@@ -1,7 +1,8 @@
 // Memòria del navegador del convidat (per trobada): què ha triat, el seu nom i el codi personal de la comanda.
 export type GuestSession = {
   quantities: Record<string, number>;
-  selections: Record<string, string[]>;
+  selections: Record<string, string[]>; // antic: ja no es fa servir
+  dishNotes: Record<string, string>; // nota lliure per a cada plat
   guestName: string;
   note: string;
   orderId: string; // identificador de la comanda (el genera el navegador una sola vegada)
@@ -9,7 +10,7 @@ export type GuestSession = {
   submitted: boolean;
 };
 
-export const emptySession = (): GuestSession => ({ quantities: {}, selections: {}, guestName: "", note: "", orderId: "", token: "", submitted: false });
+export const emptySession = (): GuestSession => ({ quantities: {}, selections: {}, dishNotes: {}, guestName: "", note: "", orderId: "", token: "", submitted: false });
 const key = (code: string) => `taula-convidat-v1:${code}`;
 
 export function loadSession(code: string): GuestSession {
@@ -20,6 +21,7 @@ export function loadSession(code: string): GuestSession {
     return {
       quantities: typeof s.quantities === "object" && s.quantities ? s.quantities : {},
       selections: typeof s.selections === "object" && s.selections ? s.selections : {},
+      dishNotes: typeof s.dishNotes === "object" && s.dishNotes ? s.dishNotes : {},
       guestName: typeof s.guestName === "string" ? s.guestName : "",
       note: typeof s.note === "string" ? s.note : "",
       orderId: typeof s.orderId === "string" ? s.orderId : "",
