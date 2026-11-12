@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { GuestLayout } from "@/components/app/GuestLayout";
+import { StepBar } from "@/components/app/StepBar";
 import { Action, actionVariants, StateMessage } from "@/components/app/primitives";
 import { SharedEstimate } from "@/components/app/SharedEstimate";
 import { plural } from "@/lib/format";
@@ -44,8 +45,8 @@ function DadesPage() {
   };
 
   return (
-    <GuestLayout back={{ to: "revisio", label: "Tornar" }} step={2}>
-      <form onSubmit={submit} className="rise pb-12 pt-8" noValidate>
+    <GuestLayout step={2}>
+      <form onSubmit={submit} className="rise pb-32 pt-8" noValidate>
         <h1 className="text-3xl font-semibold">Com et dius?</h1>
         <p className="mt-2 text-lg text-muted-foreground">Així l'organitzadora sabrà de qui és cada plat.</p>
 
@@ -62,9 +63,10 @@ function DadesPage() {
         <p className="mt-8 text-lg font-semibold">{plural(count, "plat", "plats")} a la teva comanda</p>
         <SharedEstimate />
         {sendError && <p role="alert" className="mb-4 rounded-2xl bg-destructive-soft p-4 font-semibold text-destructive">{sendError}</p>}
-        <Action type="submit" block className="mt-2" disabled={sending}>
-          {sending ? <><Loader2 className="size-5 animate-spin" aria-hidden /> Enviant…</> : submitted ? "Desar els canvis" : "Enviar comanda"}
-        </Action>
+        <StepBar
+          back={<Link to="/t/$code/revisio" params={{ code }} className={actionVariants({ variant: "outline", block: true })}>Enrere</Link>}
+          forward={<Action type="submit" block disabled={sending}>{sending ? <><Loader2 className="size-5 animate-spin" aria-hidden /> Enviant…</> : submitted ? "Desar els canvis" : "Enviar comanda"}</Action>}
+        />
       </form>
     </GuestLayout>
   );

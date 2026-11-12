@@ -48,7 +48,7 @@ export function StatusBadge({ status }: { status: MeetupStatus }) {
   );
 }
 
-export function QuantityStepper({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
+export function QuantityStepper({ value, onChange, label, onGreen = false }: { value: number; onChange: (v: number) => void; label: string; onGreen?: boolean }) {
   if (value === 0) {
     return (
       <Action variant="soft" size="md" onClick={() => onChange(1)} aria-label={`Afegir ${label}`}>
@@ -57,12 +57,12 @@ export function QuantityStepper({ value, onChange, label }: { value: number; onC
     );
   }
   return (
-    <div className="pop inline-flex items-center rounded-full bg-primary p-1 text-primary-foreground shadow-soft" role="group" aria-label={`Quantitat de ${label}`}>
-      <button className="grid size-11 place-items-center rounded-full hover:bg-primary-hover" onClick={() => onChange(value - 1)} aria-label={`Treure un ${label}`}>
+    <div className={cn("pop inline-flex items-center rounded-full p-1 shadow-soft", onGreen ? "bg-card text-success" : "bg-primary text-primary-foreground")} role="group" aria-label={`Quantitat de ${label}`}>
+      <button className={cn("grid size-11 place-items-center rounded-full", onGreen ? "hover:bg-success-soft" : "hover:bg-primary-hover")} onClick={() => onChange(value - 1)} aria-label={`Treure un ${label}`}>
         <Minus className="size-5" />
       </button>
       <span className="tabular w-8 text-center text-lg font-bold" aria-live="polite">{value}</span>
-      <button className="grid size-11 place-items-center rounded-full hover:bg-primary-hover" onClick={() => onChange(value + 1)} aria-label={`Afegir un altre ${label}`}>
+      <button className={cn("grid size-11 place-items-center rounded-full", onGreen ? "hover:bg-success-soft" : "hover:bg-primary-hover")} onClick={() => onChange(value + 1)} aria-label={`Afegir un altre ${label}`}>
         <Plus className="size-5" />
       </button>
     </div>

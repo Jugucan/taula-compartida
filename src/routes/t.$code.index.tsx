@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarDays, Clock, MapPin, ShoppingBag } from "lucide-react";
-import { useState } from "react";
+import { CalendarDays, Check, Clock, MapPin, ShoppingBag } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { GuestLayout } from "@/components/app/GuestLayout";
 import { actionVariants, QuantityStepper, StateMessage, Action } from "@/components/app/primitives";
 import { SharedEstimate } from "@/components/app/SharedEstimate";
@@ -34,6 +34,35 @@ function MeetupHeader() {
 function CartaPage() {
   const { code, hydrated, eventState, event, quantities, setQty, count } = useGuest();
   const [active, setActive] = useState("");
+  const navRef = useRef<HTMLElement | null>(null);
+
+  // La categoria de dalt segueix el que s'està mirant mentre es fa scroll.
+  useEffect(() => {
+    if (!event || event.status !== "open" || event.menu.length === 0) return;
+    const ids = event.menu.map((c) => c.id);
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      let current = ids[0] ?? "";
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= 150) current = id;
+      }
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) current = ids[ids.length - 1] ?? current;
+      setActive(current);
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    update();
+    return () => { window.removeEventListener("scroll", onScroll); if (frame) cancelAnimationFrame(frame); };
+  }, [event]);
+
+  // I la pestanya activa es manté visible dins de la barra de categories.
+  useEffect(() => {
+    const nav = navRef.current;
+    const chip = active ? document.getElementById(`chip-${active}`) : null;
+    if (nav && chip) nav.scrollTo({ left: chip.offsetLeft - nav.clientWidth / 2 + chip.clientWidth / 2, behavior: "smooth" });
+  }, [active]);
 
   if (eventState === "loading" || !hydrated) {
     return (
@@ -103,9 +132,9 @@ function CartaPage() {
       <MeetupHeader />
       <RecoverOrder />
       <SharedEstimate />
-      <nav className="sticky top-0 z-10 -mx-5 flex gap-2 overflow-x-auto border-b bg-background/95 px-5 py-3 backdrop-blur" aria-label="Categories">
+      <nav ref={navRef} className="sticky top-0 z-10 -mx-5 flex gap-2 overflow-x-auto border-b bg-background/95 px-5 py-3 backdrop-blur" aria-label="Categories">
         {event.menu.map((c) => (
-          <a key={c.id} href={`#${c.id}`} onClick={() => setActive(c.id)}
+          <a key={c.id} id={`chip-${c.id}`} href={`#${c.id}`} onClick={() => setActive(c.id)}
             className={cn("shrink-0 rounded-full px-4 py-2.5 font-semibold transition", current === c.id ? "bg-ink text-ink-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted")}>
             {c.name}
           </a>
@@ -120,20 +149,21 @@ function CartaPage() {
               {cat.dishes.map((d) => {
                 const q = quantities[d.id] ?? 0;
                 return (
-                  <li key={d.id} className={cn("rounded-2xl border p-5 transition-colors duration-200", q > 0 ? "border-ink bg-ink text-ink-foreground shadow-lift" : "bg-card")} data-triat={q > 0 ? "si" : undefined}>
+                  <li key={d.id} className={cn("rounded-2xl border p-5 transition-colors duration-200", q > 0 ? "border-success bg-success text-primary-foreground shadow-lift" : "bg-card")} data-triat={q > 0 ? "si" : undefined}>
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <h3 className="font-sans text-lg font-bold leading-snug">
+                          {q > 0 && <Check className="mr-1.5 -mt-1 inline size-5" strokeWidth={3} aria-label="Triat" />}
                           {d.name}
                           {choicesText(d) && <span className={cn("ml-2 font-semibold", q > 0 ? "text-accent" : "text-primary")}>({choicesText(d)})</span>}
                         </h3>
-                        {d.description && <p className={cn("mt-1", q > 0 ? "text-ink-foreground/75" : "text-muted-foreground")}>{d.description}</p>}
+                        {d.description && <p className={cn("mt-1", q > 0 ? "text-primary-foreground/85" : "text-muted-foreground")}>{d.description}</p>}
                         {d.tags?.map((t) => <span key={t} className="mt-2 mr-2 inline-block rounded-full bg-accent px-2.5 py-0.5 text-sm font-semibold text-accent-foreground">{t}</span>)}
                       </div>
                       <span className="tabular shrink-0 text-lg font-bold">{formatEuro(d.price)}</span>
                     </div>
                     <div className="mt-4 flex justify-end">
-                      <QuantityStepper value={q} onChange={(v) => setQty(d.id, v)} label={d.name} />
+                      <QuantityStepper value={q} onChange={(v) => setQty(d.id, v)} label={d.name} onGreen={q > 0} />
                     </div>
                   </li>
                 );

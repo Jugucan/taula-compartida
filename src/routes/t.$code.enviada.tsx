@@ -40,7 +40,7 @@ function EnviadaPage() {
           Gràcies, {guestName.trim().split(" ")[0]}. Ja està tot fet: no cal que facis res més{event ? `. Ens veiem a ${event.restaurantName}` : ""}.
         </p>
         <div className="mt-8 w-full"><OrderLines lines={lines} /><SharedEstimate /></div>
-        <Link to="/t/$code/revisio" params={{ code }} className={actionVariants({ block: true, className: "mt-6" })}>Editar la meva comanda</Link>
+        <Link to="/t/$code" params={{ code }} className={actionVariants({ block: true, className: "mt-6" })}>Editar la meva comanda</Link>
         {event && event.status === "open" && <p className="mt-4 text-muted-foreground">Pots fer canvis fins al {formatDeadline(event.deadline)}.</p>}
 
         <section className="mt-8 w-full rounded-2xl border bg-card p-5 text-left">

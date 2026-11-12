@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AlertCircle, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { GuestLayout } from "@/components/app/GuestLayout";
+import { StepBar } from "@/components/app/StepBar";
 import { Action, actionVariants, QuantityStepper, StateMessage } from "@/components/app/primitives";
 import { SharedEstimate } from "@/components/app/SharedEstimate";
 import { DishNote } from "@/components/app/DishNote";
@@ -20,18 +21,18 @@ function RevisioPage() {
   const missing = missingChoices(lines);
 
   if (!hydrated || eventState === "loading") {
-    return <GuestLayout back={{ to: "carta", label: "Tornar a la carta" }} step={1}><p className="py-10 text-center text-lg text-muted-foreground">Carregant…</p></GuestLayout>;
+    return <GuestLayout step={1}><p className="py-10 text-center text-lg text-muted-foreground">Carregant…</p></GuestLayout>;
   }
   const total = lines.reduce((sum, l) => sum + l.dish.price * l.qty, 0);
 
   return (
-    <GuestLayout back={{ to: "carta", label: "Tornar a la carta" }} step={1}>
+    <GuestLayout step={1}>
       {eventState !== "ready" || event?.status !== "open" || lines.length === 0 ? (
         <StateMessage title="La teva comanda és buida" action={<Link to="/t/$code" params={{ code }} className={actionVariants({ block: true })}>Veure la carta</Link>}>
           Torna a la carta i tria els plats que vulguis.
         </StateMessage>
       ) : (
-        <div className="rise pb-12 pt-8">
+        <div className="rise pb-32 pt-8">
           <h1 className="text-3xl font-semibold">Revisa la teva comanda</h1>
           <p className="mt-2 text-lg text-muted-foreground">Pots canviar les quantitats o treure plats.</p>
           <ul className="mt-6 space-y-3">
@@ -58,7 +59,10 @@ function RevisioPage() {
               <AlertCircle className="mt-0.5 size-5 shrink-0" aria-hidden /> Abans de continuar, escull què vols a: {missing.join(", ")}.
             </p>
           )}
-          <Action block className="mt-6" onClick={() => { if (missing.length > 0) setTried(true); else void navigate({ to: "/t/$code/dades", params: { code } }); }}>Continuar</Action>
+          <StepBar
+            back={<Link to="/t/$code" params={{ code }} className={actionVariants({ variant: "outline", block: true })}>Enrere</Link>}
+            forward={<Action block onClick={() => { if (missing.length > 0) setTried(true); else void navigate({ to: "/t/$code/dades", params: { code } }); }}>Continuar</Action>}
+          />
         </div>
       )}
     </GuestLayout>
