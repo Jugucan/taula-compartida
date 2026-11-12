@@ -6,6 +6,7 @@ import { actionVariants, QuantityStepper, StateMessage, Action } from "@/compone
 import { SharedEstimate } from "@/components/app/SharedEstimate";
 import { RecoverOrder } from "@/components/app/RecoverOrder";
 import { formatDeadline, formatEventDate } from "@/lib/events";
+import { choicesText } from "@/lib/guest-checks";
 import { formatEuro, plural } from "@/lib/format";
 import { useGuest } from "@/lib/guest-order";
 import { cn } from "@/lib/utils";
@@ -119,11 +120,14 @@ function CartaPage() {
               {cat.dishes.map((d) => {
                 const q = quantities[d.id] ?? 0;
                 return (
-                  <li key={d.id} className={cn("rounded-2xl border bg-card p-5 transition", q > 0 && "border-primary/50 shadow-soft")}>
+                  <li key={d.id} className={cn("rounded-2xl border p-5 transition-colors duration-200", q > 0 ? "border-ink bg-ink text-ink-foreground shadow-lift" : "bg-card")} data-triat={q > 0 ? "si" : undefined}>
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h3 className="font-sans text-lg font-bold leading-snug">{d.name}</h3>
-                        {d.description && <p className="mt-1 text-muted-foreground">{d.description}</p>}
+                        <h3 className="font-sans text-lg font-bold leading-snug">
+                          {d.name}
+                          {choicesText(d) && <span className={cn("ml-2 font-semibold", q > 0 ? "text-accent" : "text-primary")}>({choicesText(d)})</span>}
+                        </h3>
+                        {d.description && <p className={cn("mt-1", q > 0 ? "text-ink-foreground/75" : "text-muted-foreground")}>{d.description}</p>}
                         {d.tags?.map((t) => <span key={t} className="mt-2 mr-2 inline-block rounded-full bg-accent px-2.5 py-0.5 text-sm font-semibold text-accent-foreground">{t}</span>)}
                       </div>
                       <span className="tabular shrink-0 text-lg font-bold">{formatEuro(d.price)}</span>

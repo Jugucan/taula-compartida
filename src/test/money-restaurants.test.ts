@@ -81,8 +81,8 @@ describe("modificar un restaurant", () => {
 
 describe("opcions dels plats", () => {
   const withOptions = (label: string, values: string) => buildMenu([{ key: "a", category: "Segons", name: "Bistec", price: "15", optionLabel: label, optionValues: values }], () => "id");
-  it("converteix «Poc fet, Al punt» en una llista", () => {
-    const r = withOptions("Punt de cocció", "Poc fet, Al punt; Ben fet\nal punt");
+  it("converteix «poc fet / al punt» (o amb comes) en una llista", () => {
+    const r = withOptions("Punt de cocció", "Poc fet / Al punt, Ben fet; al punt");
     const dish = r.ok ? r.categories[0]!.dishes[0]! : undefined;
     expect(dish?.options).toEqual({ label: "Punt de cocció", values: ["Poc fet", "Al punt", "Ben fet"] });
   });

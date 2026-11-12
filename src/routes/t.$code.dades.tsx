@@ -5,6 +5,7 @@ import { GuestLayout } from "@/components/app/GuestLayout";
 import { Action, actionVariants, StateMessage } from "@/components/app/primitives";
 import { SharedEstimate } from "@/components/app/SharedEstimate";
 import { plural } from "@/lib/format";
+import { missingChoices } from "@/lib/guest-checks";
 import { useGuest } from "@/lib/guest-order";
 
 export const Route = createFileRoute("/t/$code/dades")({
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/t/$code/dades")({
 });
 
 function DadesPage() {
-  const { code, hydrated, eventState, event, guestName, setGuestName, note, setNote, count, send, submitted } = useGuest();
+  const { code, hydrated, eventState, event, guestName, setGuestName, note, setNote, count, send, submitted, lines } = useGuest();
   const [error, setError] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
@@ -32,6 +33,8 @@ function DadesPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (sending) return;
+    const missing = missingChoices(lines);
+    if (missing.length > 0) { setSendError(`Falta escollir què vols a: ${missing.join(", ")}. Torna a «Revisar» per completar-ho.`); return; }
     if (guestName.trim().length < 2) { setError(true); return; }
     setSending(true);
     setSendError("");

@@ -1,10 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trash2 } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { AlertCircle, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { GuestLayout } from "@/components/app/GuestLayout";
 import { Action, actionVariants, QuantityStepper, StateMessage } from "@/components/app/primitives";
 import { SharedEstimate } from "@/components/app/SharedEstimate";
 import { DishNote } from "@/components/app/DishNote";
 import { formatEuro } from "@/lib/format";
+import { missingChoices } from "@/lib/guest-checks";
 import { useGuest } from "@/lib/guest-order";
 
 export const Route = createFileRoute("/t/$code/revisio")({
@@ -13,6 +15,9 @@ export const Route = createFileRoute("/t/$code/revisio")({
 
 function RevisioPage() {
   const { code, hydrated, eventState, event, lines, setQty } = useGuest();
+  const navigate = useNavigate();
+  const [tried, setTried] = useState(false);
+  const missing = missingChoices(lines);
 
   if (!hydrated || eventState === "loading") {
     return <GuestLayout back={{ to: "carta", label: "Tornar a la carta" }} step={1}><p className="py-10 text-center text-lg text-muted-foreground">Carregant…</p></GuestLayout>;
@@ -42,13 +47,18 @@ function RevisioPage() {
                   </Action>
                   <QuantityStepper value={qty} onChange={(v) => setQty(dish.id, v)} label={dish.name} />
                 </div>
-                <DishNote dish={dish} qty={qty} />
+                <DishNote dish={dish} qty={qty} invalid={tried && missing.includes(dish.name)} />
               </li>
             ))}
           </ul>
           <p className="mt-6 flex items-baseline justify-between text-xl font-bold"><span>El teu total</span><span className="tabular">{formatEuro(total)}</span></p>
           <SharedEstimate />
-          <Link to="/t/$code/dades" params={{ code }} className={actionVariants({ block: true, className: "mt-6" })}>Continuar</Link>
+          {tried && missing.length > 0 && (
+            <p role="alert" className="mt-6 flex items-start gap-2 rounded-2xl bg-destructive-soft p-4 font-semibold text-destructive">
+              <AlertCircle className="mt-0.5 size-5 shrink-0" aria-hidden /> Abans de continuar, escull què vols a: {missing.join(", ")}.
+            </p>
+          )}
+          <Action block className="mt-6" onClick={() => { if (missing.length > 0) setTried(true); else void navigate({ to: "/t/$code/dades", params: { code } }); }}>Continuar</Action>
         </div>
       )}
     </GuestLayout>

@@ -24,11 +24,11 @@ const slug = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g,
 function parseOptions(dishName: string, label: string, values: string): { ok: true; options: { label: string; values: string[] } | null } | { ok: false; error: string } {
   if (!values.trim()) return { ok: true, options: null };
   const list: string[] = [];
-  for (const raw of values.split(/[,;\n]/)) {
+  for (const raw of values.split(/[,;/\n]/)) {
     const v = raw.trim();
     if (v && !list.some((x) => x.toLowerCase() === v.toLowerCase())) list.push(v);
   }
-  if (list.length < 2) return { ok: false, error: `A «${dishName}», escriu almenys dues opcions separades per comes (per exemple: Poc fet, Al punt, Ben fet).` };
+  if (list.length < 2) return { ok: false, error: `A «${dishName}», escriu almenys dues opcions separades per « / » (per exemple: poc fet / al punt / ben fet).` };
   if (list.length > 12) return { ok: false, error: `«${dishName}» té massa opcions (màxim 12).` };
   if (list.some((v) => v.length > 40)) return { ok: false, error: `Alguna opció de «${dishName}» és massa llarga.` };
   const optionLabel = label.trim() || "Opció";
