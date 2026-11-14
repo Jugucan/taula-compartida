@@ -61,6 +61,28 @@ export function optionCounts(line: DishLine): { option: string; qty: number }[] 
 /** Les notes que els convidats han escrit per a aquest plat. */
 export const itemNotes = (line: DishLine) => line.guests.filter((g) => g.itemNote).map((g) => ({ guest: g.guest, note: g.itemNote }));
 
+/**
+ * Les notes d'un plat, amb el número d'unitats a què es refereixen: «1× poc fet», «2× sense indicacions».
+ * Les notes iguals se sumen; si algú no n'ha escrit cap, es compten com a «sense indicacions».
+ * Sense cap nota, no retorna res (no cal explicar res).
+ */
+export type NoteGroup = { label: string; qty: number; guests: string[] };
+export function noteBreakdown(line: DishLine): NoteGroup[] {
+  if (!line.guests.some((g) => g.itemNote.trim())) return [];
+  const groups = new Map<string, NoteGroup>();
+  for (const g of line.guests) {
+    const note = g.itemNote.replace(/\s+/g, " ").trim();
+    const key = note ? note.toLocaleLowerCase("ca") : "";
+    const group = groups.get(key) ?? { label: note || "sense indicacions", qty: 0, guests: [] };
+    group.qty += g.qty;
+    if (!group.guests.includes(g.guest)) group.guests.push(g.guest);
+    groups.set(key, group);
+  }
+  // Primer les que tenen nota, i al final «sense indicacions».
+  return [...groups.entries()].sort(([a], [b]) => (a === "" ? 1 : 0) - (b === "" ? 1 : 0)).map(([, v]) => v);
+}
+export const noteGroupText = (g: NoteGroup) => `${g.qty}× ${g.label}`;
+
 /** «Maria (2), Pere» */
 export const guestNames = (line: DishLine) => line.guests.map((g) => (g.qty > 1 ? `${g.guest} (${g.qty})` : g.guest)).join(", ");
 
@@ -83,7 +105,7 @@ export function summaryCsv(summary: Summary, eventName: string): string {
     row(["Comandes", summary.count]),
     "",
     row(["Categoria", "Plat", "Opcions i notes", "Quantitat", "Preu unitari (€)", "Subtotal (€)"]),
-    ...summary.lines.map((l) => row([l.category, l.name, [...optionCounts(l).map((o) => `${o.option} ×${o.qty}`), ...itemNotes(l).map((n) => n.note)].join(" / "), l.qty, money(l.unitPriceCents), money(l.subtotalCents)])),
+    ...summary.lines.map((l) => row([l.category, l.name, [...optionCounts(l).map((o) => `${o.option} ×${o.qty}`), ...noteBreakdown(l).map(noteGroupText)].join(" / "), l.qty, money(l.unitPriceCents), money(l.subtotalCents)])),
     row(["", "", "", "", "Total", money(summary.totalCents)]),
   ]);
 }

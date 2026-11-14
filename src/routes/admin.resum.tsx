@@ -5,7 +5,7 @@ import { EventPicker, NoEvents, useSelectedEvent } from "@/components/app/EventP
 import { Action } from "@/components/app/primitives";
 import { formatEventDate, type StoredEvent } from "@/lib/events";
 import { formatEuro, plural } from "@/lib/format";
-import { guestNames, guestsCsv, itemNotes, optionCounts, summarize, summaryCsv } from "@/lib/order-summary";
+import { guestNames, guestsCsv, noteBreakdown, optionCounts, summarize, summaryCsv } from "@/lib/order-summary";
 import { useState } from "react";
 import { useOrders } from "@/lib/use-orders";
 
@@ -106,10 +106,10 @@ function Resum({ uid, event }: { uid: string; event: StoredEvent }) {
             <ul className="mt-2 divide-y">
               {cat.lines.map((l) => {
                 const options = optionCounts(l);
-                const notes = itemNotes(l);
+                const notes = noteBreakdown(l);
                 return (
                   <li key={l.key} className="flex justify-between gap-4 py-2.5 text-lg">
-                    <span><span className="tabular inline-block w-10 font-bold">{l.qty}×</span>{l.name} <span className="tabular text-base text-muted-foreground">({formatEuro(l.unitPriceCents)} c/u)</span>{options.length > 0 && <span className="block text-base text-primary">{options.map((o) => `${o.option} ×${o.qty}`).join(" · ")}</span>}{notes.length > 0 && <span className="block text-base text-primary">{showNames ? notes.map((n) => `${n.guest}: ${n.note}`).join(" · ") : notes.map((n) => n.note).join(" · ")}</span>}{showNames && <span className="block text-base text-muted-foreground">{guestNames(l)}</span>}</span>
+                    <span><span className="tabular inline-block w-10 font-bold">{l.qty}×</span>{l.name} <span className="tabular text-base text-muted-foreground">({formatEuro(l.unitPriceCents)} c/u)</span>{options.length > 0 && <span className="block text-base text-primary">{options.map((o) => `${o.option} ×${o.qty}`).join(" · ")}</span>}{notes.map((n) => <span key={n.label} className={`block text-base ${n.label === "sense indicacions" ? "text-muted-foreground" : "font-semibold text-primary"}`}>{n.qty}× {n.label}{showNames && ` (${n.guests.join(", ")})`}</span>)}{showNames && <span className="block text-base text-muted-foreground">{guestNames(l)}</span>}</span>
                     <span className="tabular text-muted-foreground">{formatEuro(l.subtotalCents)}</span>
                   </li>
                 );

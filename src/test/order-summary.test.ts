@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { demoMenu } from "@/data/demo";
-import { guestNames, guestsCsv, itemNotes, optionCounts, summarize, summaryCsv } from "@/lib/order-summary";
+import { guestNames, guestsCsv, itemNotes, noteBreakdown, optionCounts, summarize, summaryCsv } from "@/lib/order-summary";
 import type { StoredOrder } from "@/lib/orders";
 
 const item = (dishId: string, name: string, unit: number, qty: number, options: string[] = [], note = "") => ({ dishId, name, unitPriceCents: unit, qty, options, note, subtotalCents: unit * qty });
@@ -93,7 +93,30 @@ describe("notes lliures per plat", () => {
     expect(itemNotes(line)).toEqual([{ guest: "Maria", note: "poc fet, amb patates" }, { guest: "Pere", note: "un al punt i un ben fet" }]);
   });
   it("les notes surten al CSV del resum i al per persona", () => {
-    expect(summaryCsv(summarize(ords, demoMenu, 0), "Sopar")).toContain("Bistec;poc fet, amb patates / un al punt i un ben fet;4;15,00;60,00");
+    expect(summaryCsv(summarize(ords, demoMenu, 0), "Sopar")).toContain("Bistec;1× poc fet, amb patates / 2× un al punt i un ben fet / 1× sense indicacions;4;15,00;60,00");
     expect(guestsCsv(ords)).toContain("Maria;Bistec;1;poc fet, amb patates;15,00;15,00");
+  });
+});
+
+describe("notes amb el número d'unitats", () => {
+  const churrasco = (qty: number, note = "") => item("churrasco", "Churrasco", 1800, qty, [], note);
+  it("3 churrascos i una sola nota: «1× poc fet» i «2× sense indicacions»", () => {
+    const line = summarize([order("1", "Maria", [churrasco(1, "poc fet")]), order("2", "Pere", [churrasco(1)]), order("3", "Anna", [churrasco(1)])], demoMenu, 0).lines[0]!;
+    expect(noteBreakdown(line)).toEqual([
+      { label: "poc fet", qty: 1, guests: ["Maria"] },
+      { label: "sense indicacions", qty: 2, guests: ["Pere", "Anna"] },
+    ]);
+  });
+  it("suma les notes iguals encara que canviïn les majúscules o els espais", () => {
+    const line = summarize([order("1", "Maria", [churrasco(1, "Poc fet")]), order("2", "Pere", [churrasco(2, " poc  fet ")])], demoMenu, 0).lines[0]!;
+    expect(noteBreakdown(line)).toEqual([{ label: "Poc fet", qty: 3, guests: ["Maria", "Pere"] }]);
+  });
+  it("una nota d'una comanda de diverses unitats compta totes les unitats d'aquella persona", () => {
+    const line = summarize([order("1", "Pere", [churrasco(2, "un al punt i un ben fet")]), order("2", "Anna", [churrasco(1, "poc fet")])], demoMenu, 0).lines[0]!;
+    expect(noteBreakdown(line).map((g) => `${g.qty}× ${g.label}`)).toEqual(["2× un al punt i un ben fet", "1× poc fet"]);
+  });
+  it("si ningú ha escrit cap nota, no s'afegeix res", () => {
+    const line = summarize([order("1", "Maria", [churrasco(1)]), order("2", "Pere", [churrasco(2)])], demoMenu, 0).lines[0]!;
+    expect(noteBreakdown(line)).toEqual([]);
   });
 });
