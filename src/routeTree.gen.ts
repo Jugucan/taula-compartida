@@ -14,6 +14,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCartaRouteImport } from './routes/admin.carta'
 import { Route as AdminComandesRouteImport } from './routes/admin.comandes'
 import { Route as AdminNovaRouteImport } from './routes/admin.nova'
+import { Route as AdminOrganitzadorsRouteImport } from './routes/admin.organitzadors'
 import { Route as AdminResumRouteImport } from './routes/admin.resum'
 import { Route as TCodeRouteImport } from './routes/t.$code'
 import { Route as AdminCopiarTrobadaIdRouteImport } from './routes/admin.copiar-trobada.$id'
@@ -48,6 +49,11 @@ const AdminComandesRoute = AdminComandesRouteImport.update({
 const AdminNovaRoute = AdminNovaRouteImport.update({
   id: '/admin/nova',
   path: '/admin/nova',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminOrganitzadorsRoute = AdminOrganitzadorsRouteImport.update({
+  id: '/admin/organitzadors',
+  path: '/admin/organitzadors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminResumRoute = AdminResumRouteImport.update({
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/admin/carta': typeof AdminCartaRoute
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
+  '/admin/organitzadors': typeof AdminOrganitzadorsRoute
   '/admin/resum': typeof AdminResumRoute
   '/t/$code': typeof TCodeRouteWithChildren
   '/admin/': typeof AdminIndexRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/admin/carta': typeof AdminCartaRoute
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
+  '/admin/organitzadors': typeof AdminOrganitzadorsRoute
   '/admin/resum': typeof AdminResumRoute
   '/admin': typeof AdminIndexRoute
   '/admin/copiar-trobada/$id': typeof AdminCopiarTrobadaIdRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/admin/carta': typeof AdminCartaRoute
   '/admin/comandes': typeof AdminComandesRoute
   '/admin/nova': typeof AdminNovaRoute
+  '/admin/organitzadors': typeof AdminOrganitzadorsRoute
   '/admin/resum': typeof AdminResumRoute
   '/t/$code': typeof TCodeRouteWithChildren
   '/admin/': typeof AdminIndexRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/admin/carta'
     | '/admin/comandes'
     | '/admin/nova'
+    | '/admin/organitzadors'
     | '/admin/resum'
     | '/t/$code'
     | '/admin/'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/admin/carta'
     | '/admin/comandes'
     | '/admin/nova'
+    | '/admin/organitzadors'
     | '/admin/resum'
     | '/admin'
     | '/admin/copiar-trobada/$id'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/admin/carta'
     | '/admin/comandes'
     | '/admin/nova'
+    | '/admin/organitzadors'
     | '/admin/resum'
     | '/t/$code'
     | '/admin/'
@@ -210,6 +222,7 @@ export interface RootRouteChildren {
   AdminCartaRoute: typeof AdminCartaRoute
   AdminComandesRoute: typeof AdminComandesRoute
   AdminNovaRoute: typeof AdminNovaRoute
+  AdminOrganitzadorsRoute: typeof AdminOrganitzadorsRoute
   AdminResumRoute: typeof AdminResumRoute
   TCodeRoute: typeof TCodeRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
@@ -254,6 +267,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/nova'
       fullPath: '/admin/nova'
       preLoaderRoute: typeof AdminNovaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/organitzadors': {
+      id: '/admin/organitzadors'
+      path: '/admin/organitzadors'
+      fullPath: '/admin/organitzadors'
+      preLoaderRoute: typeof AdminOrganitzadorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/resum': {
@@ -350,6 +370,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminCartaRoute: AdminCartaRoute,
   AdminComandesRoute: AdminComandesRoute,
   AdminNovaRoute: AdminNovaRoute,
+  AdminOrganitzadorsRoute: AdminOrganitzadorsRoute,
   AdminResumRoute: AdminResumRoute,
   TCodeRoute: TCodeRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,

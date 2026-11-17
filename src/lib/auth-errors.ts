@@ -11,6 +11,10 @@ export function authErrorMessage(code: unknown): string {
       return "Has fet massa intents. Espera uns minuts i torna-ho a provar.";
     case "auth/network-request-failed":
       return "No hi ha connexió a Internet. Comprova-ho i torna-ho a provar.";
+    case "auth/email-already-in-use":
+      return "Aquest correu ja té un compte. Prova d'entrar amb la teva contrasenya.";
+    case "auth/weak-password":
+      return "La contrasenya és massa curta o massa fàcil. Fes-la d'almenys 8 caràcters.";
     case "auth/missing-password":
       return "Escriu la contrasenya.";
     default:

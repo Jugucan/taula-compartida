@@ -1,8 +1,10 @@
 // Porta d'entrada de la zona d'organitzadora: només es veu el contingut si s'ha iniciat sessió.
 // Els convidats no passen mai per aquí.
 import { createContext, useContext, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   browserSessionPersistence,
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
   setPersistence,
@@ -13,6 +15,8 @@ import {
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { getClientAuth, getClientDb } from "@/lib/firebase-client";
 import { authErrorMessage } from "@/lib/auth-errors";
+import { createMyRequest, hasMyRequest, requestsOpen } from "@/lib/access";
+import { isSuperAdmin } from "@/lib/access-config";
 import { Action, Logo } from "./primitives";
 
 // Identificador de l'organitzadora; el fan servir les pantalles de dins de la zona protegida.
@@ -45,17 +49,23 @@ function LoginForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
+  const [signup, setSignup] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => { void requestsOpen().then(setOpen); }, []);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    setBusy(true);
     setError("");
     setInfo("");
+    if (signup && password.length < 8) { setError("La contrasenya ha de tenir almenys 8 caràcters."); return; }
+    setBusy(true);
     try {
       const auth = getClientAuth();
       // La sessió es tanca quan es tanca el navegador (més segur en ordinadors compartits).
       await setPersistence(auth, browserSessionPersistence);
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      if (signup) await createUserWithEmailAndPassword(auth, email.trim(), password);
+      else await signInWithEmailAndPassword(auth, email.trim(), password);
     } catch (err) {
       setError(authErrorMessage((err as { code?: string }).code));
       setBusy(false);
@@ -79,23 +89,76 @@ function LoginForm() {
 
   return (
     <Screen>
-      <h1 className="text-center text-3xl font-semibold">Entra com a organitzadora</h1>
+      <h1 className="text-center text-3xl font-semibold">{signup ? "Demana accés com a organitzador" : "Entra com a organitzador"}</h1>
+      {signup && <p className="mt-3 text-center text-lg text-muted-foreground">Crea un compte i demana accés. Podràs entrar quan s'aprovi.</p>}
       <form onSubmit={submit} className="mt-8 space-y-5">
         <div>
           <label htmlFor="correu" className="mb-2 block text-lg font-semibold">Correu</label>
           <input id="correu" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} className={fieldClass} />
         </div>
         <div>
-          <label htmlFor="contrasenya" className="mb-2 block text-lg font-semibold">Contrasenya</label>
-          <input id="contrasenya" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className={fieldClass} />
+          <label htmlFor="contrasenya" className="mb-2 block text-lg font-semibold">Contrasenya{signup && <span className="font-normal text-muted-foreground"> (mínim 8 caràcters)</span>}</label>
+          <input id="contrasenya" type="password" autoComplete={signup ? "new-password" : "current-password"} required value={password} onChange={(e) => setPassword(e.target.value)} className={fieldClass} />
         </div>
         {error && <p role="alert" className="rounded-2xl bg-warning-soft p-4 text-warning">{error}</p>}
         {info && <p role="status" className="rounded-2xl bg-success-soft p-4 text-success">{info}</p>}
-        <Action type="submit" block disabled={busy}>{busy ? "Entrant…" : "Entrar"}</Action>
-        <button type="button" onClick={resetPassword} className="block w-full py-2 text-center font-semibold text-primary underline">
-          He oblidat la contrasenya
-        </button>
+        <Action type="submit" block disabled={busy}>{busy ? (signup ? "Creant el compte…" : "Entrant…") : signup ? "Crear el compte" : "Entrar"}</Action>
+        {!signup && (
+          <button type="button" onClick={resetPassword} className="block w-full py-2 text-center font-semibold text-primary underline">
+            He oblidat la contrasenya
+          </button>
+        )}
+        {(open || signup) && (
+          <button type="button" onClick={() => { setSignup(!signup); setError(""); setInfo(""); }} className="block w-full py-2 text-center font-semibold underline">
+            {signup ? "Ja tinc un compte: vull entrar" : "No tinc compte: vull demanar accés"}
+          </button>
+        )}
       </form>
+    </Screen>
+  );
+}
+
+/** Un compte amb sessió però sense permís: pot demanar accés (si s'accepten sol·licituds) i esperar l'aprovació. */
+function NoAccess({ user }: { user: User }) {
+  const [state, setState] = useState<"loading" | "pending" | "open" | "closed" | "sending" | "error">("loading");
+
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      if (await hasMyRequest(user.uid)) { if (alive) setState("pending"); return; }
+      const open = await requestsOpen();
+      if (alive) setState(open ? "open" : "closed");
+    })();
+    return () => { alive = false; };
+  }, [user.uid]);
+
+  async function ask() {
+    setState("sending");
+    try {
+      await createMyRequest(user.uid, user.email ?? "");
+      setState("pending");
+    } catch {
+      setState("error");
+    }
+  }
+
+  return (
+    <Screen>
+      {state === "loading" && <p className="text-center text-lg text-muted-foreground">Un moment…</p>}
+      {state === "pending" && (
+        <p role="status" className="rounded-2xl bg-success-soft p-5 text-lg font-semibold text-success">Sol·licitud enviada. Quan s'aprovi, podràs entrar amb aquest mateix compte. Torna-ho a provar més endavant.</p>
+      )}
+      {(state === "open" || state === "sending" || state === "error") && (
+        <>
+          <p className="rounded-2xl bg-warning-soft p-5 text-lg font-semibold text-warning">Aquest compte encara no té accés a la zona d'organitzador.</p>
+          {state === "error" && <p role="alert" className="mt-4 rounded-2xl bg-destructive-soft p-4 font-semibold text-destructive">No s'ha pogut enviar la sol·licitud. Torna-ho a provar.</p>}
+          <div className="mt-5"><Action block onClick={ask} disabled={state === "sending"}>{state === "sending" ? "Enviant…" : "Demanar accés"}</Action></div>
+        </>
+      )}
+      {state === "closed" && (
+        <p role="alert" className="rounded-2xl bg-warning-soft p-5 text-lg font-semibold text-warning">Aquest compte no té permís per entrar a la zona d'organitzador, i ara mateix no s'accepten noves sol·licituds.</p>
+      )}
+      <div className="mt-6"><Action block variant="outline" onClick={() => signOut(getClientAuth())}>Tanca la sessió</Action></div>
     </Screen>
   );
 }
@@ -105,6 +168,7 @@ export function AdminGate({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [workspaceReady, setWorkspaceReady] = useState(false);
   const [workspaceError, setWorkspaceError] = useState(false);
+  const [noAccess, setNoAccess] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => onAuthStateChanged(getClientAuth(), setUser), []);
@@ -115,9 +179,10 @@ export function AdminGate({ children }: { children: ReactNode }) {
       return;
     }
     setWorkspaceError(false);
+    setNoAccess(false);
     ensureWorkspace(user.uid)
       .then(() => setWorkspaceReady(true))
-      .catch(() => setWorkspaceError(true));
+      .catch((e: { code?: string }) => (e?.code === "permission-denied" ? setNoAccess(true) : setWorkspaceError(true)));
   }, [user, attempt]);
 
   if (user === undefined) {
@@ -125,6 +190,7 @@ export function AdminGate({ children }: { children: ReactNode }) {
   }
   if (user === null) return <LoginForm />;
 
+  if (noAccess) return <NoAccess user={user} />;
   if (workspaceError) {
     return (
       <Screen>
@@ -144,7 +210,10 @@ export function AdminGate({ children }: { children: ReactNode }) {
     <>
       <div className="no-print flex items-center justify-between gap-3 bg-secondary px-5 py-2 text-sm">
         <span className="truncate">Sessió iniciada: {user.email}</span>
-        <button onClick={() => signOut(getClientAuth())} className="shrink-0 font-semibold underline">Tanca la sessió</button>
+        <span className="flex shrink-0 items-center gap-4">
+          {isSuperAdmin(user.uid) && <Link to="/admin/organitzadors" className="font-semibold underline">Organitzadors</Link>}
+          <button onClick={() => signOut(getClientAuth())} className="font-semibold underline">Tanca la sessió</button>
+        </span>
       </div>
       <AdminUidContext.Provider value={user.uid}>{children}</AdminUidContext.Provider>
     </>

@@ -62,6 +62,7 @@ export function adminHead(title: string, description: string) {
   return {
     meta: [
       { title: `${title} · Taula` },
+      { name: "robots", content: "noindex, nofollow" },
       { name: "description", content: description },
       { property: "og:title", content: `${title} · Taula` },
       { property: "og:description", content: description },
