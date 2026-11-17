@@ -15,7 +15,9 @@ import {
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { getClientAuth, getClientDb } from "@/lib/firebase-client";
 import { authErrorMessage } from "@/lib/auth-errors";
-import { createMyRequest, hasMyRequest, requestsOpen } from "@/lib/access";
+import { countRequests, createMyRequest, getMyOrganizerStatus, hasMyRequest, requestsOpen } from "@/lib/access";
+import { accessScreen, type AccessScreen } from "@/lib/access-logic";
+import { useQuery } from "@tanstack/react-query";
 import { isSuperAdmin } from "@/lib/access-config";
 import { Action, Logo } from "./primitives";
 
@@ -89,8 +91,8 @@ function LoginForm() {
 
   return (
     <Screen>
-      <h1 className="text-center text-3xl font-semibold">{signup ? "Demana accés com a organitzador" : "Entra com a organitzador"}</h1>
-      {signup && <p className="mt-3 text-center text-lg text-muted-foreground">Crea un compte i demana accés. Podràs entrar quan s'aprovi.</p>}
+      <h1 className="text-center text-3xl font-semibold">{signup ? "Crea el teu compte d'organitzador" : "Entra com a organitzador"}</h1>
+      {signup && <p className="mt-3 text-center text-lg text-muted-foreground">Posa el teu correu i una contrasenya. La sol·licitud s'envia soleta i podràs entrar quan s'aprovi.</p>}
       <form onSubmit={submit} className="mt-8 space-y-5">
         <div>
           <label htmlFor="correu" className="mb-2 block text-lg font-semibold">Correu</label>
@@ -102,7 +104,7 @@ function LoginForm() {
         </div>
         {error && <p role="alert" className="rounded-2xl bg-warning-soft p-4 text-warning">{error}</p>}
         {info && <p role="status" className="rounded-2xl bg-success-soft p-4 text-success">{info}</p>}
-        <Action type="submit" block disabled={busy}>{busy ? (signup ? "Creant el compte…" : "Entrant…") : signup ? "Crear el compte" : "Entrar"}</Action>
+        <Action type="submit" block disabled={busy}>{busy ? (signup ? "Creant el compte…" : "Entrant…") : signup ? "Crear el compte i demanar accés" : "Entrar"}</Action>
         {!signup && (
           <button type="button" onClick={resetPassword} className="block w-full py-2 text-center font-semibold text-primary underline">
             He oblidat la contrasenya
@@ -110,7 +112,7 @@ function LoginForm() {
         )}
         {(open || signup) && (
           <button type="button" onClick={() => { setSignup(!signup); setError(""); setInfo(""); }} className="block w-full py-2 text-center font-semibold underline">
-            {signup ? "Ja tinc un compte: vull entrar" : "No tinc compte: vull demanar accés"}
+            {signup ? "Ja tinc un compte: vull entrar" : "No tinc compte: vull crear-ne un"}
           </button>
         )}
       </form>
@@ -118,45 +120,51 @@ function LoginForm() {
   );
 }
 
-/** Un compte amb sessió però sense permís: pot demanar accés (si s'accepten sol·licituds) i esperar l'aprovació. */
+/** Un compte amb sessió però sense permís: si les sol·licituds estan obertes, la sol·licitud es crea soleta i només cal esperar l'aprovació. */
 function NoAccess({ user }: { user: User }) {
-  const [state, setState] = useState<"loading" | "pending" | "open" | "closed" | "sending" | "error">("loading");
+  const [screen, setScreen] = useState<AccessScreen | "loading" | "error">("loading");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let alive = true;
     void (async () => {
-      if (await hasMyRequest(user.uid)) { if (alive) setState("pending"); return; }
-      const open = await requestsOpen();
-      if (alive) setState(open ? "open" : "closed");
+      setScreen("loading");
+      const [organizerStatus, hasRequest, open] = await Promise.all([getMyOrganizerStatus(user.uid), hasMyRequest(user.uid), requestsOpen()]);
+      let next = accessScreen({ organizerStatus, hasRequest, requestsOpen: open });
+      if (next === "create-request") {
+        try {
+          await createMyRequest(user.uid, user.email ?? "");
+          next = "pending";
+        } catch {
+          if (alive) setScreen("error");
+          return;
+        }
+      }
+      if (alive) setScreen(next);
     })();
     return () => { alive = false; };
-  }, [user.uid]);
-
-  async function ask() {
-    setState("sending");
-    try {
-      await createMyRequest(user.uid, user.email ?? "");
-      setState("pending");
-    } catch {
-      setState("error");
-    }
-  }
+  }, [user.uid, user.email, attempt]);
 
   return (
     <Screen>
-      {state === "loading" && <p className="text-center text-lg text-muted-foreground">Un moment…</p>}
-      {state === "pending" && (
-        <p role="status" className="rounded-2xl bg-success-soft p-5 text-lg font-semibold text-success">Sol·licitud enviada. Quan s'aprovi, podràs entrar amb aquest mateix compte. Torna-ho a provar més endavant.</p>
+      {screen === "loading" && <p className="text-center text-lg text-muted-foreground">Un moment…</p>}
+      {screen === "pending" && (
+        <p role="status" className="rounded-2xl bg-success-soft p-5 text-lg font-semibold text-success">Sol·licitud enviada! Quan s'aprovi, podràs entrar amb aquest mateix correu i contrasenya. Torna-ho a provar més endavant.</p>
       )}
-      {(state === "open" || state === "sending" || state === "error") && (
-        <>
-          <p className="rounded-2xl bg-warning-soft p-5 text-lg font-semibold text-warning">Aquest compte encara no té accés a la zona d'organitzador.</p>
-          {state === "error" && <p role="alert" className="mt-4 rounded-2xl bg-destructive-soft p-4 font-semibold text-destructive">No s'ha pogut enviar la sol·licitud. Torna-ho a provar.</p>}
-          <div className="mt-5"><Action block onClick={ask} disabled={state === "sending"}>{state === "sending" ? "Enviant…" : "Demanar accés"}</Action></div>
-        </>
+      {screen === "rejected" && (
+        <p role="alert" className="rounded-2xl bg-warning-soft p-5 text-lg font-semibold text-warning">La sol·licitud d'aquest compte no ha estat acceptada.</p>
       )}
-      {state === "closed" && (
+      {screen === "suspended" && (
+        <p role="alert" className="rounded-2xl bg-warning-soft p-5 text-lg font-semibold text-warning">Aquest compte està suspès temporalment.</p>
+      )}
+      {screen === "closed" && (
         <p role="alert" className="rounded-2xl bg-warning-soft p-5 text-lg font-semibold text-warning">Aquest compte no té permís per entrar a la zona d'organitzador, i ara mateix no s'accepten noves sol·licituds.</p>
+      )}
+      {screen === "error" && (
+        <>
+          <p role="alert" className="rounded-2xl bg-destructive-soft p-5 text-lg font-semibold text-destructive">No s'ha pogut enviar la sol·licitud. Comprova la connexió i torna-ho a provar.</p>
+          <div className="mt-5"><Action block onClick={() => setAttempt((n) => n + 1)}>Tornar-ho a provar</Action></div>
+        </>
       )}
       <div className="mt-6"><Action block variant="outline" onClick={() => signOut(getClientAuth())}>Tanca la sessió</Action></div>
     </Screen>
@@ -170,6 +178,7 @@ export function AdminGate({ children }: { children: ReactNode }) {
   const [workspaceError, setWorkspaceError] = useState(false);
   const [noAccess, setNoAccess] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const pending = useQuery({ queryKey: ["access", "count"], queryFn: countRequests, enabled: !!user && isSuperAdmin(user.uid), staleTime: 60_000, retry: false });
 
   useEffect(() => onAuthStateChanged(getClientAuth(), setUser), []);
 
@@ -211,7 +220,7 @@ export function AdminGate({ children }: { children: ReactNode }) {
       <div className="no-print flex items-center justify-between gap-3 bg-secondary px-5 py-2 text-sm">
         <span className="truncate">Sessió iniciada: {user.email}</span>
         <span className="flex shrink-0 items-center gap-4">
-          {isSuperAdmin(user.uid) && <Link to="/admin/organitzadors" className="font-semibold underline">Organitzadors</Link>}
+          {isSuperAdmin(user.uid) && <Link to="/admin/organitzadors" className="font-semibold underline">Organitzadors{pending.data ? <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-sm text-primary-foreground" aria-label={`${pending.data} sol·licituds pendents`}>{pending.data}</span> : null}</Link>}
           <button onClick={() => signOut(getClientAuth())} className="font-semibold underline">Tanca la sessió</button>
         </span>
       </div>

@@ -69,7 +69,7 @@ function Manager() {
               <div><p className="text-lg font-bold">{r.email}</p><p className="text-muted-foreground">Demanat el {date(r.createdAt)}</p></div>
               <div className="flex gap-3">
                 <Action size="md" disabled={run.isPending} onClick={() => run.mutate(() => approveRequest(r))}>Aprovar</Action>
-                <Action size="md" variant="outline" disabled={run.isPending} onClick={() => run.mutate(() => rejectRequest(r.uid))}>Rebutjar</Action>
+                <Action size="md" variant="outline" disabled={run.isPending} onClick={() => run.mutate(() => rejectRequest(r))}>Rebutjar</Action>
               </div>
             </li>
           ))}
@@ -87,10 +87,10 @@ function Manager() {
             <li key={o.uid} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-lg font-bold">{o.email}</p>
-                <p className={o.status === "active" ? "text-success" : "text-warning"}>{o.status === "active" ? "Actiu" : "Suspès"} · des del {date(o.createdAt)}</p>
+                <p className={o.status === "active" ? "text-success" : "text-warning"}>{o.status === "active" ? "Actiu" : o.status === "suspended" ? "Suspès" : "Sol·licitud rebutjada"} · des del {date(o.createdAt)}</p>
               </div>
               <Action size="md" variant="outline" disabled={run.isPending} onClick={() => run.mutate(() => setOrganizerStatus(o.uid, o.status === "active" ? "suspended" : "active"))}>
-                {o.status === "active" ? "Suspendre" : "Reactivar"}
+                {o.status === "active" ? "Suspendre" : o.status === "suspended" ? "Reactivar" : "Aprovar igualment"}
               </Action>
             </li>
           ))}
