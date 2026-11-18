@@ -2,7 +2,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, Plus, Trash2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { useAdminUid } from "@/components/app/AdminGate";
 import { Action, actionVariants } from "@/components/app/primitives";
 import { getClientAuth } from "@/lib/firebase-client";
@@ -32,6 +32,7 @@ export function RestaurantForm({ existing }: { existing?: StoredRestaurant }) {
   const [importing, setImporting] = useState(false);
   const [importMsg, setImportMsg] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const update = (key: string, patch: Partial<DishDraft>) => setRows((r) => r.map((x) => (x.key === key ? { ...x, ...patch } : x)));
   const refresh = () => Promise.all([
@@ -64,6 +65,41 @@ export function RestaurantForm({ existing }: { existing?: StoredRestaurant }) {
       addImported(result.dishes, result.withoutPrice);
     } catch {
       setImportMsg({ tone: "error", text: "No he pogut llegir la carta ara mateix. Comprova la connexió o enganxa'n el text." });
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  async function readFile(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setImportMsg(null);
+    const lower = file.name.toLowerCase();
+    if (file.size > 8 * 1024 * 1024) return setImportMsg({ tone: "error", text: "Aquest fitxer és massa gran (màxim 8 MB)." });
+    if (lower.endsWith(".xls")) return setImportMsg({ tone: "error", text: "Els Excel antics (.xls) no es poden llegir. Obre'l amb Excel i desa'l com a .xlsx o .csv." });
+    if (!/\.(pdf|xlsx|csv|txt)$/.test(lower)) return setImportMsg({ tone: "error", text: "Només puc llegir fitxers PDF, Excel (.xlsx), CSV o de text." });
+    setImporting(true);
+    try {
+      let text = "";
+      if (lower.endsWith(".pdf")) {
+        const { extractPdfText } = await import("@/lib/menu-pdf");
+        text = await extractPdfText(new Uint8Array(await file.arrayBuffer()));
+      } else if (lower.endsWith(".xlsx")) {
+        const { readXlsxRows, rowsToMenuText } = await import("@/lib/menu-file");
+        text = rowsToMenuText(readXlsxRows(new Uint8Array(await file.arrayBuffer())));
+      } else if (lower.endsWith(".csv")) {
+        const { csvToRows, rowsToMenuText } = await import("@/lib/menu-file");
+        text = rowsToMenuText(csvToRows(await file.text()));
+      } else {
+        text = await file.text();
+      }
+      if (!text.trim()) return setImportMsg({ tone: "error", text: "No he trobat text en aquest fitxer. Si és un PDF fet amb una foto o escanejat, no el puc llegir: prova amb el text de la web o amb un Excel." });
+      setImportText(text.slice(0, 60000));
+      setImportMode("text");
+      setImportMsg({ tone: "ok", text: `He llegit «${file.name}». Revisa el text de sota (pots corregir-lo) i clica «Llegir el text».` });
+    } catch (err) {
+      setImportMsg({ tone: "error", text: err instanceof Error && /Excel/.test(err.message) ? err.message : "No he pogut llegir aquest fitxer. Prova d'enganxar-ne el text." });
     } finally {
       setImporting(false);
     }
@@ -152,6 +188,8 @@ export function RestaurantForm({ existing }: { existing?: StoredRestaurant }) {
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <Action variant={importMode === "url" ? "ink" : "outline"} size="md" onClick={() => { setImportMode(importMode === "url" ? null : "url"); setImportMsg(null); }}>Des d'un enllaç de la web</Action>
             <Action variant={importMode === "text" ? "ink" : "outline"} size="md" onClick={() => { setImportMode(importMode === "text" ? null : "text"); setImportMsg(null); }}>Enganxar el text de la carta</Action>
+            <Action variant="outline" size="md" onClick={() => fileInput.current?.click()} disabled={importing}>{importing ? "Llegint el fitxer…" : "Pujar un PDF o Excel"}</Action>
+            <input ref={fileInput} type="file" accept=".pdf,.xlsx,.csv,.txt" className="hidden" onChange={readFile} aria-label="Pujar un fitxer amb la carta" />
           </div>
           {importMode === "url" && (
             <div className="mt-4">
