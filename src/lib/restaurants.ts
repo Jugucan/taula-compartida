@@ -2,7 +2,7 @@
 // Model: workspaces/{uid}/restaurants/{id} amb la carta dins del mateix document
 // (una sola lectura per restaurant). Preus en cèntims enters.
 import { collection, deleteDoc, doc, getDoc, getDocs, increment, limit, orderBy, query, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
-import type { Dish, MenuCategory } from "@/data/demo";
+import type { Dish, MenuCategory } from "@/lib/menu-types";
 import { centsToInput, parseEuroToCents } from "@/lib/money";
 import { getClientDb } from "@/lib/firebase-client";
 

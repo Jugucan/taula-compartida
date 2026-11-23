@@ -2,7 +2,7 @@
 // Model: workspaces/{uid}/events/{id}, amb una CÒPIA de la carta (preus en cèntims) feta en crear-la.
 // A més, links/{codi} -> { wsId, eventId } permet que el servidor trobi la trobada a partir de l'enllaç públic.
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, updateDoc, writeBatch } from "firebase/firestore";
-import type { MenuCategory } from "@/data/demo";
+import type { MenuCategory } from "@/lib/menu-types";
 import { getClientDb } from "@/lib/firebase-client";
 import { parseEuroToCents } from "@/lib/money";
 import type { StoredRestaurant } from "@/lib/restaurants";

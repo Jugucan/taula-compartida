@@ -1,4 +1,4 @@
-import type { Dish } from "@/data/demo";
+import type { Dish } from "@/lib/menu-types";
 import { choicesText } from "@/lib/guest-checks";
 import { useGuest } from "@/lib/guest-order";
 import { cn } from "@/lib/utils";

@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Home, ListChecks, PlusCircle, Receipt } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
-import { AdminGate } from "./AdminGate";
-import { DemoRibbon, Logo } from "./primitives";
+import { AdminGate, useAdminEmail } from "./AdminGate";
+import { Logo } from "./primitives";
 
 const nav = [
   { to: "/admin", label: "Inici", icon: Home },
@@ -12,9 +12,9 @@ const nav = [
 ] as const;
 
 function AdminLayoutInner({ children, title, subtitle, actions }: { children: ReactNode; title: string; subtitle?: string; actions?: ReactNode }) {
+  const email = useAdminEmail();
   return (
     <div className="min-h-screen pb-24 md:pb-0">
-      <DemoRibbon />
       <header className="no-print border-b bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
           <Link to="/admin" aria-label="Inici"><Logo /></Link>
@@ -25,7 +25,7 @@ function AdminLayoutInner({ children, title, subtitle, actions }: { children: Re
               </Link>
             ))}
           </nav>
-          <span className="grid size-10 place-items-center rounded-full bg-accent font-semibold text-accent-foreground" aria-label="Organitzadora: Laia">L</span>
+          <span className="grid size-10 place-items-center rounded-full bg-accent font-semibold text-accent-foreground" aria-label={`Sessió: ${email}`}>{(email[0] ?? "?").toUpperCase()}</span>
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-5 py-8 md:py-12">

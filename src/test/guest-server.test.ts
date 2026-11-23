@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { demoMenu } from "@/data/demo";
+import { demoMenu } from "@/test/demo-menu";
 import { createFakeDb } from "./fake-db";
 
 let db = createFakeDb();

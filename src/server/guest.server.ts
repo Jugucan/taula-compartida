@@ -1,7 +1,7 @@
 // Accés dels CONVIDATS a les dades, només des del servidor (Admin SDK).
 // Els convidats no entren mai directament a Firestore: aquí es comprova tot.
 import { createHash, timingSafeEqual } from "node:crypto";
-import type { MenuCategory } from "@/data/demo";
+import type { MenuCategory } from "@/lib/menu-types";
 import { effectiveStatus, type EventStatus } from "@/lib/event-time";
 import type { MyOrder, PublicEvent, SendOrderInput, SendOrderResult } from "@/lib/guest-types";
 import { decideSubmit, isValidOrderId, isValidToken } from "@/lib/order-submit";

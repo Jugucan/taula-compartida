@@ -1,3 +1,12 @@
 [build]
   command = "npm install -g bun && bun install && bun run build"
   publish = "dist"
+
+# Capçaleres de seguretat bàsiques
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"

@@ -1,5 +1,5 @@
 // Resum consolidat de les comandes: totals, plats, i exportació a CSV. Lògica pura, en cèntims.
-import type { MenuCategory } from "@/data/demo";
+import type { MenuCategory } from "@/lib/menu-types";
 import type { StoredOrder } from "@/lib/orders";
 
 export type DishGuest = { guest: string; qty: number; options: string[]; note: string; itemNote: string }; // note: la de tota la comanda; itemNote: la d'aquest plat

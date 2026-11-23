@@ -1,7 +1,7 @@
 // Estat de la comanda d'un convidat, per trobada. Les dades de la trobada vénen del servidor; la selecció és local fins que s'envia.
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { Dish } from "@/data/demo";
+import type { Dish } from "@/lib/menu-types";
 import { getMyOrder, getPublicEvent, sendOrder } from "@/lib/guest-api";
 import type { PublicEvent } from "@/lib/guest-types";
 import { emptySession, loadSession, parsePersonalHash, personalLink, randomToken, saveSession, type GuestSession } from "@/lib/guest-session";

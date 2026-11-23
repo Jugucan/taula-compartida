@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { AlertTriangle, CheckCircle2, CircleDashed, Lock, Flag, Minus, Plus, Loader2 } from "lucide-react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import type { MeetupStatus } from "@/data/demo";
+import type { EventStatus as MeetupStatus } from "@/lib/event-time";
 
 export const actionVariants = cva(
   "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-200 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 select-none",
@@ -92,15 +92,6 @@ export function StateMessage({ tone = "neutral", title, children, action, icon }
       <h2 className="text-2xl font-semibold">{title}</h2>
       {children && <div className="mt-3 text-lg text-muted-foreground">{children}</div>}
       {action && <div className="mt-8 w-full">{action}</div>}
-    </div>
-  );
-}
-
-export function DemoRibbon() {
-  return (
-    <div className="no-print bg-ink px-4 py-2 text-center text-sm text-ink-foreground">
-      Prototip de demostració · les dades són d'exemple i res no s'envia de veritat ·{" "}
-      <Link to="/" className="underline underline-offset-2">Índex de pantalles</Link>
     </div>
   );
 }

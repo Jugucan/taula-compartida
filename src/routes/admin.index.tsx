@@ -19,7 +19,7 @@ const actions = [
 
 function AdminHome() {
   return (
-    <AdminLayout title="Bon dia, Laia" subtitle="Què vols fer avui?">
+    <AdminLayout title="Bon dia" subtitle="Què vols fer avui?">
       <div className="grid gap-4 md:grid-cols-3">
         {actions.map((a) => (
           <Link key={a.to} to={a.to} className={`group rise flex min-h-36 flex-col justify-between rounded-3xl p-6 shadow-soft transition hover:shadow-lift ${"primary" in a ? "bg-primary text-primary-foreground" : "border bg-card"}`}>

@@ -1,5 +1,5 @@
 // Dades que el servidor ensenya als convidats. NO inclou mai pressupost, identificadors interns ni comandes d'altres persones.
-import type { MenuCategory } from "@/data/demo";
+import type { MenuCategory } from "@/lib/menu-types";
 import type { EventStatus } from "@/lib/event-time";
 
 export type PublicEvent = {

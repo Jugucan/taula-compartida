@@ -24,6 +24,9 @@ import { Action, Logo } from "./primitives";
 // Identificador de l'organitzadora; el fan servir les pantalles de dins de la zona protegida.
 const AdminUidContext = createContext<string>("");
 export const useAdminUid = () => useContext(AdminUidContext);
+const AdminEmailContext = createContext<string>("");
+/** El correu amb què s'ha iniciat sessió (per mostrar-lo a la capçalera). */
+export const useAdminEmail = () => useContext(AdminEmailContext);
 
 const fieldClass = "min-h-14 w-full rounded-2xl border-2 border-input bg-card px-4 text-lg outline-none focus:border-primary";
 
@@ -224,7 +227,7 @@ export function AdminGate({ children }: { children: ReactNode }) {
           <button onClick={() => signOut(getClientAuth())} className="font-semibold underline">Tanca la sessió</button>
         </span>
       </div>
-      <AdminUidContext.Provider value={user.uid}>{children}</AdminUidContext.Provider>
+      <AdminUidContext.Provider value={user.uid}><AdminEmailContext.Provider value={user.email ?? ""}>{children}</AdminEmailContext.Provider></AdminUidContext.Provider>
     </>
   );
 }

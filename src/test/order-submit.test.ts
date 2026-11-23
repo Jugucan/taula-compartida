@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demoMenu } from "@/data/demo";
+import { demoMenu } from "@/test/demo-menu";
 import { decideSubmit } from "@/lib/order-submit";
 
 const ID = "11111111-2222-3333-4444-555555555555";

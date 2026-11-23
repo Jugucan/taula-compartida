@@ -1,7 +1,7 @@
 // Càlcul i validació d'una comanda a partir de la carta del SERVIDOR.
 // El navegador només diu "quin plat i quantes unitats"; els preus i noms es treuen sempre de la carta.
 // Tots els imports són en cèntims enters.
-import type { MenuCategory } from "@/data/demo";
+import type { MenuCategory } from "@/lib/menu-types";
 
 export type OrderItemInput = { dishId: string; qty: number; options?: string[]; note?: string };
 export type PricedItem = {

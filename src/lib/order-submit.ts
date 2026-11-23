@@ -1,6 +1,6 @@
 // Decideix què fer amb una comanda enviada per un convidat. Lògica pura, sense base de dades (es prova a part).
 // El navegador només diu "quins plats i quantes unitats"; els preus es treuen sempre de la carta del servidor.
-import type { MenuCategory } from "@/data/demo";
+import type { MenuCategory } from "@/lib/menu-types";
 import { deadlinePassed, type EventStatus } from "@/lib/event-time";
 import { priceOrder, type PricedItem } from "@/lib/order-pricing";
 

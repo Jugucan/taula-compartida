@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demoMenu } from "@/data/demo";
+import { demoMenu } from "@/test/demo-menu";
 import { guestNames, guestsCsv, itemNotes, noteBreakdown, optionCounts, summarize, summaryCsv } from "@/lib/order-summary";
 import type { StoredOrder } from "@/lib/orders";
 

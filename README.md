@@ -1,669 +1,140 @@
-# Shared Table Order Gatherer
-
-DISSENY D'UNA APP WEB PREMIUM, MINIMALISTA I ULTRASENZILLA PER GESTIONAR COMANDES DE GRUP
-
-
-
-1. EL TEU PAPER
-
-
-
-Actua com un director creatiu digital, dissenyador UX/UI sènior i especialista en disseny de productes SaaS moderns, accessibles i visualment atractius.
-
-
-
-Vull que dissenyis un prototip visual d'alta fidelitat d'una aplicació web per gestionar sopars de grup, trobades, menús de restaurant i comandes individuals.
-
-
-
-La teva missió és crear una experiència visual tan ben resolta que sembli un producte digital real, professional i preparat per presentar a possibles clients.
-
-
-
-En aquesta fase, prioritza el disseny visual i l'experiència d'usuari. La implementació definitiva de la lògica de negoci, la base de dades, la seguretat i les integracions es farà posteriorment amb Claude.
-
-
-
-No vull una plantilla genèrica de dashboard. Vull una interfície amb personalitat, acabats polits, una jerarquia visual excel·lent i una experiència d'ús molt intuïtiva.
-
-
-
-2. VISIÓ DEL PRODUCTE
-
-
-
-L'aplicació serveix per organitzar àpats de grup en restaurants.
-
-
-
-L'organitzador crea una trobada, selecciona un restaurant, incorpora la carta, comparteix un enllaç i recull les comandes dels convidats. Després pot revisar les quantitats, controlar el pressupost i obtenir un resum consolidat per al restaurant.
-
-
-
-L'aplicació ha de ser reutilitzable per a múltiples trobades i, potencialment, convertir-se en un producte comercial.
-
-
-
-El seu valor diferencial és que permet gestionar tot aquest procés de manera extraordinàriament senzilla.
-
-
-
-Principi fonamental
-
-
-
-La tecnologia ha de ser invisible per a l'usuari.
-
-
-
-No vull que les persones hagin d'aprendre a utilitzar una eina complicada. Vull que obrin l'enllaç, entenguin què han de fer i ho facin sense ajuda.
-
-
-
-El disseny ha de ser especialment accessible per a persones grans o amb poca experiència tecnològica.
-
-
-
-3. DIRECCIÓ ARTÍSTICA
-
-
-
-Crea un disseny modern, elegant, càlid i minimalista, amb aparença de producte premium.
-
-
-
-Busco una estètica cuidada, com la d'una startup digital actual, però sense semblar una eina corporativa freda ni una aplicació financera complexa.
-
-
-
-Estil visual
-
-
-
-- Minimalisme càlid.
-
-- Espais en blanc generosos.
-
-- Tipografia moderna, molt llegible i amb una jerarquia clara.
-
-- Composicions equilibrades.
-
-- Targetes netes, amb vores suaus i separacions subtils.
-
-- Ombres discretes, només quan aportin profunditat.
-
-- Icones coherents i fàcils d'entendre.
-
-- Microinteraccions suaus i elegants.
-
-- Colors amb personalitat, però sense saturar la interfície.
-
-- Fotografia gastronòmica atractiva quan realment ajudi a entendre o valorar els plats.
-
-
-
-Evita l'aspecte de plantilla predeterminada, els gradients excessius, les targetes repetitives, les animacions innecessàries, les pantalles carregades i els efectes decoratius sense una funció clara.
-
-
-
-No facis que sembli una còpia de cap aplicació existent. Crea una identitat visual pròpia.
-
-
-
-Sistema visual coherent
-
-
-
-Defineix i aplica un sistema de disseny consistent:
-
-
-
-- Paleta de colors.
-
-- Tipografia i escales de mida.
-
-- Espaiats.
-
-- Radi de cantonades.
-
-- Ombres.
-
-- Estils de botons.
-
-- Camps de formulari.
-
-- Targetes.
-
-- Etiquetes d'estat.
-
-- Missatges d'error, èxit i càrrega.
-
-- Estats buits i pantalles sense dades.
-
-
-
-La interfície ha de mantenir la mateixa personalitat en totes les pantalles.
-
-
-
-4. ACCESSIBILITAT I FACILITAT D'ÚS
-
-
-
-Aquest punt és tan important com l'estètica.
-
-
-
-Dissenya per a persones que no tenen gaire experiència amb aplicacions web.
-
-
-
-- Utilitza textos en català planer.
-
-- Prioritza una mida de text còmoda, especialment al mòbil.
-
-- Mantén un contrast suficient entre text i fons.
-
-- Fes servir botons grans i fàcils de prémer.
-
-- Deixa espai suficient entre controls.
-
-- No depenguis únicament de les icones per explicar accions.
-
-- Mostra etiquetes textuals als controls importants.
-
-- Evita formularis llargs.
-
-- Evita menús amb massa nivells.
-
-- Mostra una acció principal clara a cada pantalla.
-
-- Fes visibles els preus i els totals.
-
-- Utilitza missatges de confirmació clars.
-
-- No utilitzis el color com a únic indicador d'un estat.
-
-- Dissenya també els estats de càrrega, error, èxit i absència de dades.
-
-
-
-No redueixis la llegibilitat per intentar encabir més informació en una pantalla.
-
-
-
-5. EXPERIÈNCIA DEL CONVIDAT
-
-
-
-Aquesta és la part més important del producte.
-
-
-
-El convidat accedeix mitjançant un enllaç i no ha de crear cap compte.
-
-
-
-Dissenya el flux complet perquè sigui visualment evident i fàcil de seguir.
-
-
-
-Pantalla A. Carta del restaurant
-
-
-
-Ha de mostrar:
-
-
-
-- Nom de la trobada.
-
-- Nom del restaurant.
-
-- Data, si escau.
-
-- Carta dividida en categories senzilles.
-
-- Plats amb nom, descripció opcional i preu.
-
-- Controls grans per afegir plats i modificar quantitats.
-
-- Un resum persistent i fàcil d'accedir a la comanda actual.
-
-
-
-El resum podria mostrar:
-
-
-
-«La meva comanda · 2 plats · 28,00 €»
-
-
-
-En mòbils, dissenya una barra inferior clara i elegant que permeti revisar la comanda sense tapar el contingut important.
-
-
-
-Pantalla B. Revisió de la comanda
-
-
-
-Mostra els plats seleccionats, les quantitats, els preus individuals i el total.
-
-
-
-Permet imaginar visualment com es modificarien o eliminarien els plats.
-
-
-
-El botó principal ha de ser inequívoc, per exemple:
-
-
-
-«Continuar»
-
-
-
-Pantalla C. Confirmació de dades
-
-
-
-Dissenya un formulari molt curt, amb el nom del convidat com a dada principal.
-
-
-
-Evita demanar informació personal innecessària.
-
-
-
-El botó principal serà:
-
-
-
-«Enviar comanda»
-
-
-
-Pantalla D. Confirmació final
-
-
-
-Crea una pantalla agradable i tranquil·litzadora, amb un indicador visual d'èxit i el missatge:
-
-
-
-«Comanda enviada correctament!»
-
-
-
-Mostra un resum breu de la comanda i el total.
-
-
-
-La persona ha de tenir clar que ha acabat i que no necessita fer res més.
-
-
-
-Estats addicionals
-
-
-
-Dissenya també:
-
-
-
-- Carta sense plats disponibles.
-
-- Comanda encara buida.
-
-- Error en carregar la carta.
-
-- Comandes tancades.
-
-- Estat de càrrega.
-
-- Comanda enviada correctament.
-
-
-
-6. EXPERIÈNCIA DE L'ADMINISTRADOR
-
-
-
-La zona administrativa ha de ser tan senzilla com sigui possible.
-
-
-
-Ha de tenir una aparença professional, però no ha de semblar un panell de control complex.
-
-
-
-Pantalla A. Inici
-
-
-
-Mostra les trobades recents i les accions principals.
-
-
-
-Les tres accions destacades han de ser:
-
-
-
-1. «Crear una trobada».
-
-2. «Gestionar les comandes».
-
-3. «Veure els resums».
-
-
-
-Les trobades han de tenir estats visuals clars: esborrany, oberta, tancada o finalitzada.
-
-
-
-No omplis la pantalla de gràfics ni de mètriques decoratives.
-
-
-
-Pantalla B. Crear una trobada
-
-
-
-Dissenya un formulari net i curt amb:
-
-
-
-- Nom de la trobada.
-
-- Data.
-
-- Restaurant.
-
-- Pressupost opcional.
-
-- Data límit de les comandes.
-
-
-
-Agrupa la informació de manera lògica i evita mostrar opcions avançades innecessàries.
-
-
-
-Pantalla C. Seleccionar o importar una carta
-
-
-
-Mostra els restaurants disponibles i una opció clara per afegir-ne un.
-
-
-
-El procés d'importació ha de començar amb un camp senzill:
-
-
-
-«Enganxa l'enllaç de la carta del restaurant»
-
-
-
-I un botó:
-
-
-
-«Importar carta»
-
-
-
-Dissenya els estats visuals per a:
-
-
-
-- Importació en curs.
-
-- Importació completada.
-
-- Importació parcial.
-
-- Error d'importació.
-
-- Revisió de plats i preus abans de desar.
-
-
-
-La revisió ha de permetre veure i corregir la informació detectada sense confusió.
-
-
-
-Pantalla D. Seguiment de comandes
-
-
-
-Mostra el nombre de comandes rebudes, el total acumulat i l'estat de la trobada.
-
-
-
-Les dades han de ser fàcils de llegir i consultar des d'un mòbil o ordinador.
-
-
-
-Inclou un accés clar a les comandes individuals i al resum consolidat.
-
-
-
-Pantalla E. Pressupost i resum final
-
-
-
-Mostra, quan hi hagi pressupost definit:
-
-
-
-- Pressupost màxim.
-
-- Import de les comandes.
-
-- Import restant o excés.
-
-
-
-Utilitza una visualització senzilla, no un dashboard analític complex.
-
-
-
-Dissenya una vista de resum final per al restaurant, neta i fàcil d'imprimir.
-
-
-
-7. DISSENY RESPONSIVE
-
-
-
-Dissenya primer per a mòbils, però assegura't que la versió d'escriptori sigui igualment polida.
-
-
-
-Prepara les adaptacions per a:
-
-
-
-- Mòbils petits.
-
-- Mòbils grans.
-
-- Tauletes.
-
-- Ordinadors.
-
-
-
-No et limitis a reduir la mida dels elements. Reorganitza la interfície segons el dispositiu.
-
-
-
-En mòbils, prioritza el contingut, els botons i la navegació directa.
-
-
-
-En ordinadors, aprofita l'espai disponible sense convertir la interfície en un panell sobrecarregat.
-
-
-
-8. INTERACCIONS DEL PROTOTIP
-
-
-
-Vull un prototip navegable que permeti comprovar el disseny abans de desenvolupar la funcionalitat definitiva.
-
-
-
-Implementa interaccions simulades per poder provar visualment:
-
-
-
-- Navegació entre les pantalles principals.
-
-- Afegir i eliminar plats.
-
-- Modificar quantitats.
-
-- Actualitzar visualment el total.
-
-- Revisar una comanda.
-
-- Simular l'enviament.
-
-- Veure la confirmació.
-
-- Navegar per la zona administrativa.
-
-- Obrir el formulari de creació d'una trobada.
-
-- Seleccionar un restaurant.
-
-- Visualitzar la importació i revisió d'una carta.
-
-- Consultar un resum de comandes.
-
-
-
-Utilitza dades de demostració coherents i identificables com a tals.
-
-
-
-Les interaccions només han de simular el comportament necessari per validar l'experiència. No implementis una base de dades real ni una lògica de negoci definitiva.
-
-
-
-No presentis una comanda simulada com si s'hagués enviat realment.
-
-
-
-9. PREPARACIÓ PER A LA IMPLEMENTACIÓ POSTERIOR AMB CLAUDE
-
-
-
-El codi del prototip ha de ser fàcil d'inspeccionar i de transferir a un desenvolupament posterior.
-
-
-
-Preferiblement, utilitza React i TypeScript, amb components reutilitzables i una estructura clara.
-
-
-
-- Separa els components visuals de les dades de demostració.
-
-- Utilitza noms de components i variables descriptius.
-
-- Evita components monolítics difícils de mantenir.
-
-- Centralitza els estils i els tokens visuals.
-
-- Evita dependències innecessàries.
-
-- No implementis autenticació real.
-
-- No connectis Firebase.
-
-- No creïs funcions de servidor.
-
-- No implementis integracions amb IA ni importacions reals.
-
-- No afegeixis sistemes de pagament.
-
-- No introdueixis secrets ni credencials.
-
-- No construeixis una arquitectura complexa que no sigui necessària per a una maqueta.
-
-
-
-Les interaccions simulades han d'estar prou separades del disseny perquè Claude pugui substituir-les per funcionalitat real sense haver de reconstruir la interfície.
-
-
-
-No sacrifiquis la qualitat visual per simplificar el codi. Busco un prototip atractiu, però ordenat i fàcil de mantenir.
-
-
-
-10. CRITERIS DE QUALITAT
-
-
-
-Abans de donar el prototip per acabat, revisa'l amb aquests criteris:
-
-
-
-- Sembla un producte digital real i professional.
-
-- Té una identitat visual coherent i reconeixible.
-
-- La interfície no sembla una plantilla genèrica.
-
-- Les pantalles són netes i fàcils de llegir.
-
-- Els botons principals són evidents.
-
-- La selecció de plats és intuïtiva.
-
-- El total de la comanda és fàcil de localitzar.
-
-- Les confirmacions són clares.
-
-- La zona administrativa no està sobrecarregada.
-
-- El disseny funciona bé en mòbils i ordinadors.
-
-- Les persones grans poden llegir i utilitzar els controls còmodament.
-
-- Les pantalles d'error, càrrega i absència de dades també estan dissenyades.
-
-- El prototip es pot recórrer sense trobar botons importants que no facin res.
-
-- El codi és prou net perquè un altre desenvolupador pugui continuar el projecte.
-
-
-
-11. INSTRUCCIÓ FINAL
-
-
-
-Comença creant una experiència visual completa i coherent, no una simple landing page.
-
-
-
-Dona prioritat a les pantalles reals del producte: la carta, la selecció de plats, el resum, la confirmació, la zona administrativa i la gestió de trobades.
-
-
-
-Pren decisions creatives pròpies quan calgui. No em demanis una llarga llista de preferències visuals abans de començar.
-
-
-
-Vull veure una primera proposta amb personalitat, qualitat visual i una experiència d'usuari impecable.
-
-
-
-Recorda: aquesta fase serveix per definir com es veurà i com s'utilitzarà el producte. La funcionalitat real i la infraestructura es desenvoluparan després.
-
-
-
-Objectiu final: una app preciosa, minimalista, accessible i tan fàcil d'utilitzar que ningú necessiti que li expliquin com funciona.
+# Taula Compartida
+
+Aplicació web per organitzar trobades al voltant d'un restaurant: l'organitzador carrega la carta (des d'un enllaç, un PDF, un Excel
+o text), comparteix un enllaç amb els convidats, cada convidat tria els seus plats **sense crear cap compte**, i l'organitzador obté el
+resum per enviar al restaurant (impressió/PDF o CSV). L'app **no envia comandes al restaurant ni fa cap cobrament**.
+
+## Com està fet
+
+| Peça | Tecnologia |
+|---|---|
+| Aplicació | React 19 + TypeScript, [TanStack Start](https://tanstack.com/start) (rutes per fitxer), Tailwind 4 |
+| Base de dades i comptes | Firebase: Cloud Firestore + Authentication (correu i contrasenya) |
+| Servidor | Funcions de servidor de TanStack Start, que Netlify executa com a funcions (`nitro: { preset: "netlify" }`) |
+| Publicació | Netlify, connectat a aquest repositori de GitHub (cada *commit* a `main` publica l'app) |
+| Gestor de paquets | `bun` |
+
+### Carpetes importants (`src/`)
+
+- `routes/` — les pantalles. `admin.*` són de l'organitzador; `t.$code.*` són dels convidats (l'enllaç és `/t/<codi>`).
+- `components/app/` — peces visuals pròpies (`AdminGate` = porta d'entrada de l'organitzador, `RestaurantForm`, `EventForm`…).
+- `lib/` — la lògica: preus en cèntims (`money.ts`, `order-pricing.ts`), estat i termini de les trobades (`event-time.ts`, `events.ts`),
+  resum i CSV (`order-summary.ts`), lectura de cartes (`menu-import.ts`, `menu-file.ts`, `menu-pdf.ts`), gestió d'accés (`access*.ts`).
+- `server/` — codi que **només** s'executa al servidor (accés de Firebase amb credencials d'administrador, descàrrega segura de pàgines,
+  comandes dels convidats). Mai s'importa des del navegador.
+- `test/` — proves automàtiques.
+- `firestore.rules` — **les regles de seguretat de la base de dades** (veure més avall).
+
+## Com funciona (resum)
+
+**Organitzador.** Entra a `/admin` amb correu i contrasenya. Crea restaurants (carta amb preus), crea trobades (que guarden una
+**còpia de la carta i dels preus** del moment), obre i tanca les comandes, i consulta *Comandes* i *Resum*. Una trobada oberta es
+**tanca sola** quan acaba el dia límit (hora de Catalunya); es pot tornar a obrir en qualsevol moment i es pot copiar per repetir-la.
+
+**Convidat.** Obre l'enllaç, tria plats i quantitats, a «Revisar» escriu opcionalment una nota per plat (salsa, punt de cocció…),
+posa el seu nom i envia. Pot tornar a editar la comanda amb el seu **enllaç personal** mentre estigui oberta.
+
+**Preus.** Sempre en **cèntims enters**. El navegador només diu «quin plat i quantes unitats»; els preus i els totals els calcula
+**el servidor** a partir de la carta guardada. Una comanda confirmada conserva els preus que tenia, encara que la carta canviï.
+
+**Comandes sense duplicats.** Cada comanda té un identificador i un codi secret generats pel navegador; repetir l'enviament
+(doble clic, error de xarxa, refrescar) actualitza la mateixa comanda i no en crea una de nova. Només es guarda un resum (hash) del
+codi secret.
+
+## Seguretat
+
+- **Les regles de Firestore** (`firestore.rules`) decideixen qui pot llegir i escriure. Els convidats **no** accedeixen mai a Firestore:
+  tot passa per funcions de servidor que validen les dades.
+- **Superadministradora:** el seu *User UID* és a `firestore.rules` i a `src/lib/access-config.ts`. Només ella aprova, rebutja o suspèn
+  organitzadors (pàgina **Organitzadors**) i obre o tanca les sol·licituds.
+- **Organitzadors:** cadascun només pot treballar al **seu** espai (`workspaces/<seu uid>`), i només si està aprovat i actiu.
+- **Lectura de cartes des d'un enllaç:** només per a comptes admesos; el servidor bloqueja adreces locals, privades i de metadades
+  del núvol (també en cada redirecció), i limita temps, mida i redireccions.
+- **Secrets:** les credencials de servidor són només a Netlify (variables d'entorn). La configuració web de Firebase
+  (`src/lib/firebase-config.ts`) **no** és secreta.
+- **Capçaleres de seguretat** bàsiques a `netlify.toml`.
+
+### Què s'ha provat i què no
+
+Les proves automàtiques (`bun run test`) cobreixen el càlcul de preus, la validació de comandes, la lògica del servidor dels
+convidats (amb una base de dades simulada), la protecció de les adreces de la lectura de cartes, la comprovació del «passi» de sessió
+i la lectura de cartes. **Les regles de Firestore no es poden executar automàticament** en aquest entorn; es van validar a mà amb comptes
+reals (un compte sense permís no pot entrar ni crear dades; un compte aprovat sí; un compte suspès no). Si canvies les regles, **repeteix
+aquesta prova**.
+
+## Posar-ho en marxa des de zero
+
+1. **Firebase** ([console.firebase.google.com](https://console.firebase.google.com)): crea un projecte (pla **Spark**, sense facturació; sense Analytics).
+   Activa **Firestore** (mode producció, ubicació d'Europa) i **Authentication → Email/Password**.
+2. Registra una **app web** i copia la seva configuració (no secreta) a `src/lib/firebase-config.ts`.
+3. Crea el teu usuari a **Authentication → Users** i copia'n el **User UID** a `firestore.rules` (funció `isSuperAdmin`) i a
+   `src/lib/access-config.ts` (`SUPERADMIN_UID`).
+4. Publica el contingut de `firestore.rules` a **Firestore Database → Rules**.
+5. A **Project settings → Service accounts**, genera una clau privada i posa'n tres valors a **Netlify** com a variables d'entorn
+   (veure `.env.example`): `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`. **Esborra el fitxer descarregat.**
+6. **Netlify**: importa el repositori de GitHub. L'ordre de construcció és a `netlify.toml`.
+7. No cal cap índex compost de Firestore: totes les consultes són d'un sol camp.
+
+## Fer canvis
+
+Les modificacions es fan editant fitxers a GitHub. **Cada *commit* a `main` fa un desplegament nou.** Si has de fer molts canvis
+seguits, a Netlify pots aturar-ne les construccions (*Build & deploy → Continuous deployment → Build status → Stop builds*) i
+tornar-les a activar al final, perquè se'n faci un de sol. Abans de pujar canvis grans, els tests i la compilació
+(`bun run test`, `bun run build`) tenen la darrera paraula.
+
+Comandes útils (amb `bun` instal·lat): `bun install`, `bun run dev` (servidor local), `bun run build`, `bun run test`.
+
+## Consum de Firebase (Spark: 50.000 lectures i 20.000 escriptures al dia, 1 GiB)
+
+| Acció | Lectures | Escriptures |
+|---|---|---|
+| Entrar a l'organitzador (una vegada per sessió) | 1 (+ fins a 10 si es veu l'inici) | 0–1 (només el primer cop) |
+| Veure l'inici (les 10 trobades recents; es reaprofita 2 min) | fins a 10 | 0 |
+| Llista de restaurants (es reaprofita 5 min) | 1 per restaurant | 0 |
+| Obrir una trobada des de la llista | 0 | 0 |
+| Crear / copiar una trobada | 0 | 2 (trobada + enllaç) |
+| Modificar trobada, canviar-ne l'estat, desar un restaurant | 0 | 1 |
+| Convidat: veure la carta (es reaprofita 60 s) | 2 | 0 |
+| Convidat: enviar o canviar la comanda | 3 | 2 |
+| Convidat: recuperar la seva comanda amb l'enllaç personal | 2 | 0 |
+| Comandes / Resum (es reaprofita 30 s; botó «Actualitzar») | 1 per comanda (màx. 300) | 0 |
+| Exportar CSV, imprimir | 0 (usa el que ja és carregat) | 0 |
+| Llegir una carta des d'enllaç | 1 | 0 |
+| Pujar PDF / Excel / enganxar text | 0 (es fa al navegador) | 0 |
+
+Els organitzadors que no són la superadministradora fan **1 lectura addicional** per consulta (comprovació d'aprovació a les regles).
+No hi ha connexions en temps real (cap `onSnapshot`): el consum només creix quan algú fa una acció.
+
+## Costos i límits a vigilar
+
+- **Firebase Spark** no pot generar factures: si s'esgota una quota, el servei deixa de respondre fins que es renova. **No passis a
+  Blaze** sense decidir-ho expressament.
+- **Netlify:** el pla actual compta minuts de compilació (revisa'l a *Usage*). Les funcions del servidor també tenen límit d'ús.
+- No s'utilitza cap servei d'IA ni de reconeixement de text: la lectura de cartes és local o amb regles pròpies.
+
+## Limitacions conegudes
+
+- **Sense avisos per correu:** ni a l'organitzadora quan arriba una sol·licitud, ni al nou organitzador quan s'aprova.
+- **Sol·licituds obertes:** qualsevol persona pot crear-se un compte (només identitat, sense dades) i enviar una sol·licitud; algú
+  mal intencionat podria omplir la llista. Per defecte estan **tancades**. Una verificació anti-robots es pot afegir més endavant.
+- **Sense límit per adreça IP** a les peticions dels convidats; només hi ha un límit de **300 comandes per trobada** i límits de mida.
+- **Plans i pagaments:** la base està preparada (comptes aprovats, estat, camp `plan`), però no hi ha subscripcions ni límits d'ús per pla.
+- **Opcions múltiples per plat:** els convidats escriuen una nota lliure a cada plat; no hi ha desplegables.
+- **PDF escanejats (fotos) i Excel antics (.xls)** no es poden llegir. Les cartes a dues columnes poden barrejar línies (el text es pot
+  corregir abans de llegir-lo).
+- **Càrrega des d'enllaç:** algunes webs no es poden llegir (per exemple, les que carreguen la carta amb JavaScript); aleshores es pot
+  enganxar el text.
+- Els convidats que perdin el seu enllaç personal no poden recuperar la comanda (només l'organitzadora la veu).
+- `@lovable.dev/vite-tanstack-config` (a `vite.config.ts`) és un residu de l'eina amb què es va crear el disseny; encara fa de base de la
+  configuració de construcció. Substituir-lo és possible però cal fer-ho amb cura.
+
+## Si alguna cosa falla en producció
+
+1. **Mira el registre de la construcció** a Netlify (*Deploys* → l'últim desplegament). Copia'n les últimes 30 línies.
+2. **Els convidats no veuen la carta:** comprova que les variables d'entorn de Netlify són totes tres i completes, i que les
+   funcions no fallen. Un cas real: una llibreria que es carregava a l'arrencada i que Netlify (Node 24) no suportava va trencar
+   la càrrega; per això la comprovació del «passi» d'inici de sessió fa servir la llibreria `jose` directament
+   (`src/server/firebase-token.server.ts`) i no `firebase-admin/auth`.
+3. **Un canvi no es veu:** recarrega sense memòria cau (Ctrl+F5). Els convidats poden veure la carta guardada fins a 60 segons.
+4. **Has trencat les regles de Firestore i no pots entrar:** enganxa a *Rules* la versió anterior de `firestore.rules` (l'historial de
+   GitHub la guarda) i publica.

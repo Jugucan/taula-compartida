@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demoMenu } from "@/data/demo";
+import { demoMenu } from "@/test/demo-menu";
 import { priceOrder } from "@/lib/order-pricing";
 
 const withOptions = demoMenu.flatMap((c) => c.dishes).find((d) => d.options)!;
