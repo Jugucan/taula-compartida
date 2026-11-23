@@ -1,2 +1,0 @@
-- Keep prototype submissions, guest recovery and per-person extras in the shared OrderProvider with browser storage hydrated after mount; this demonstrates cross-screen flows without implying production persistence or secure identity verification.
-- Keep shared-cost, name-matching and dish-consolidation rules in browser-safe pure helpers with concrete tests so guest and organiser views use the same calculation.
